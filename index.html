@@ -1,650 +1,141 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dona Elma Esculturas - Miniaturas Feitas à Mão</title>
+    <title>Elma Doces - Cardápio</title>
     
-    <!-- Meta Pixel Code -->
-    <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1552875369012305');
-    fbq('track', 'PageView');
-    </script>
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=1552875369012305&ev=PageView&noscript=1"
-    /></noscript>
-    <!-- End Meta Pixel Code -->
-
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="favicon.png" type="image/png">
-    <!-- Fonte Inter do Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
     <style>
+        /* Estilo customizado para a fonte Inter */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f7f3f2; /* Cor de fundo suave */
         }
-        .text-brown-custom {
-            color: #4b3832; /* Marrom escuro */
-        }
-        .bg-brown-custom {
-            background-color: #4b3832;
-        }
-        .bg-brown-light {
-            background-color: #a4918e; /* Marrom mais claro para contraste */
-        }
-        .border-brown-custom {
-            border-color: #4b3832;
-        }
-        /* Estilos para a seção de FAQ */
-        .faq-item input[type="checkbox"] {
-            display: none;
-        }
-        .faq-item input[type="checkbox"]:checked ~ .faq-content {
-            max-height: 500px;
-            padding-top: 0.5rem;
-        }
-        .faq-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease-out, padding-top 0.4s ease-out;
-        }
-        .faq-item input[type="checkbox"]:checked ~ label .faq-icon {
-            transform: rotate(45deg);
-        }
-        /* Ocultar barra de rolagem horizontal */
-        .scrollbar-hide {
-            -ms-overflow-style: none; /* Para Internet Explorer e Edge */
-            scrollbar-width: none; /* Para Firefox */
-        }
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none; /* Para Chrome, Safari e Opera */
-        }
-        /* Estilos para seleção de preço */
-        .price-card.selected {
-            border-width: 2px;
-            border-color: #f59e0b; /* border-yellow-500 */
-            transform: scale(1.05);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        .price-card .check-icon {
-            position: absolute;
-            top: 0.75rem;
-            right: 0.75rem;
-            color: #f59e0b; /* text-yellow-500 */
-            opacity: 0;
-            transition: opacity 0.2s ease-in-out;
-        }
-        .price-card.selected .check-icon {
-            opacity: 1;
-        }
-        /* Estilos para o carrossel */
-        .gallery-container {
-            scroll-behavior: smooth;
-        }
-        /* Estilo para garantir que as imagens não fiquem 'amassadas' */
-        .gallery-image {
-            width: 256px; /* Equivalente a w-64 */
-            height: 256px; /* Mantém a proporção quadrada */
-            object-fit: cover; /* Recorta a imagem para cobrir o espaço sem distorcer */
-        }
-        /* Estilos para o botão flutuante do WhatsApp */
-        .whatsapp-float {
-            position: fixed;
-            width: 60px;
-            height: 60px;
-            bottom: 40px;
-            right: 40px;
-            background-color: #25d366;
-            color: #FFF;
-            border-radius: 50px;
-            text-align: center;
-            font-size: 30px;
-            box-shadow: 2px 2px 3px #999;
-            z-index: 100;
-            transition: transform 0.2s ease-in-out;
-        }
-        .whatsapp-float:hover {
-            transform: scale(1.1);
-        }
-        .whatsapp-float img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
+        /* Para garantir que a barra de navegação não sobreponha o conteúdo final */
+        main {
+            padding-bottom: 80px;
         }
     </style>
 </head>
-<body class="text-brown-custom">
+<body class="bg-gray-50">
 
-    <!-- Header & Hero Section -->
-    <header class="bg-brown-custom text-white py-4 px-6 md:px-12 rounded-b-[40px] shadow-xl sticky top-0 z-50">
-        <nav class="container mx-auto flex justify-between items-center">
-            <a href="#" class="text-3xl font-bold">Dona Elma Esculturas</a>
-            <a href="#prices" class="px-6 py-2 bg-yellow-400 text-brown-custom font-bold rounded-full shadow-md transition-all duration-300 ease-in-out hover:bg-yellow-500 hover:shadow-lg transform hover:scale-110">
-                Quero uma miniatura
+    <!-- Container principal que simula a tela de um celular -->
+    <div class="max-w-sm mx-auto bg-white min-h-screen shadow-lg">
+        
+        <!-- Cabeçalho com imagem de banner -->
+        <header>
+            <div class="h-32 bg-cover bg-center" style="background-image: url('https://iili.io/KJsfN6v.png')">
+                <!-- Imagem de fundo dos doces -->
+            </div>
+            <div class="p-4 bg-white">
+                <div class="flex items-center space-x-4">
+                    <!-- Logo da loja -->
+                    <img src="https://iili.io/KJsFwDg.png" alt="Logo Elma Doces" class="w-16 h-16 rounded-full border-2 border-white -mt-10 shadow-md">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Elma Doces</h1>
+                        <p class="text-sm text-pink-600 font-semibold cursor-pointer">Ver mais</p>
+                        <p class="text-xs text-gray-500 mt-1">Pedido mínimo R$ 15,00</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="p-4">
+            <!-- Barra de busca -->
+            <div class="relative mb-4">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <i data-feather="search" class="w-5 h-5 text-gray-400"></i>
+                </span>
+                <input type="text" placeholder="Buscar no cardápio" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-pink-400">
+            </div>
+
+            <!-- Informações de entrega -->
+            <div class="flex justify-between items-center border border-gray-200 rounded-lg p-3 mb-6">
+                <div class="flex items-center space-x-3">
+                    <i data-feather="clock" class="w-5 h-5 text-gray-600"></i>
+                    <span class="text-gray-800 font-medium">Entrega</span>
+                </div>
+                <div class="text-right">
+                    <p class="font-semibold text-gray-800">Hoje</p>
+                    <p class="text-xs text-gray-500">30-45 min • R$ 5,00</p>
+                </div>
+            </div>
+
+            <!-- Seção de Destaques -->
+            <section>
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Destaques</h2>
+                
+                <!-- Grid de produtos -->
+                <div class="grid grid-cols-1 gap-6">
+                    
+                    <!-- Produto 1: Tablete Recheado Pistache -->
+                    <div class="flex items-start space-x-4 bg-white rounded-lg overflow-hidden">
+                        <img src="https://static.ifood-static.com.br/image/upload/t_medium/pratos/1fc01f2a-c53e-4186-9b3b-be2c41527dcc/202508032331_C284_i.jpg" alt="Tablete Recheado Pistache" class="w-28 h-28 object-cover rounded-md">
+                        <div class="py-2 pr-2 flex-1">
+                            <h3 class="font-semibold text-gray-800">Tablete Recheado Pistache Emily In Paris 90G</h3>
+                            <p class="text-sm text-gray-500 mt-1">Delicioso tablete de chocolate com recheio cremoso de pistache.</p>
+                            <p class="font-bold text-lg text-green-600 mt-2">R$ 9,90</p>
+                        </div>
+                    </div>
+
+                    <!-- Produto 2: Cesta Lanut -->
+                    <div class="flex items-start space-x-4 bg-white rounded-lg overflow-hidden">
+                        <img src="https://static.ifood-static.com.br/image/upload/t_medium/pratos/2c6f230b-9ea3-4160-a513-64cafdcf096b/202508111422_AQ84_i.jpg" alt="Cesta Lanut" class="w-28 h-28 object-cover rounded-md">
+                        <div class="py-2 pr-2 flex-1">
+                            <h3 class="font-semibold text-gray-800">Cesta Lanut</h3>
+                            <p class="text-sm text-gray-500 mt-1">1 Kit Acessório G, 1 Caixa Minishow Lanut 108g, 1 Tablete 100g Lanut Avelã, 1 Tablete 100g Lanut Avelã Branco, 1 Tablete 30g Bc Imunidade, 1 Chocowafer 80g Lanut, 1 Slack 315g Lanut, 3 Tabletes 20g Lanut Ao Leite, 2 Trufas 30g Lanut, 2 Trufas 30g Grancherie</p>
+                            <p class="font-bold text-lg text-green-600 mt-2">R$ 119,90</p>
+                        </div>
+                    </div>
+
+                    <!-- Produto 3: Carnauba Speculos -->
+                    <div class="flex items-start space-x-4 bg-white rounded-lg overflow-hidden">
+                        <img src="https://static.ifood-static.com.br/image/upload/t_medium/pratos/2c6f230b-9ea3-4160-a513-64cafdcf096b/202508061108_T578_i.jpg" alt="Carnauba Speculos" class="w-28 h-28 object-cover rounded-md">
+                        <div class="py-2 pr-2 flex-1">
+                            <h3 class="font-semibold text-gray-800">Carnauba Speculos</h3>
+                            <p class="text-sm text-gray-500 mt-1">1 Drageado Speculos 100g, 1 Biscoito Ao Leite 85g, 4 Tablete Lacreme Kids 18g, 1 Cx Miau Ao Leite 70g, 4 Trufas Tradicional 30g, Café Filtrado 100g</p>
+                            <p class="font-bold text-lg text-green-600 mt-2">R$ 89,90</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Barra de Navegação Inferior -->
+        <footer class="fixed bottom-0 left-0 right-0 max-w-sm mx-auto bg-white border-t border-gray-200 flex justify-around py-2">
+            <a href="#" class="flex flex-col items-center text-pink-600 w-1/4">
+                <i data-feather="home" class="w-6 h-6"></i>
+                <span class="text-xs font-medium">Início</span>
             </a>
-        </nav>
-    </header>
-
-    <main class="container mx-auto px-6 py-12 md:py-20">
-        <!-- Hero Section -->
-        <section id="hero" class="flex flex-col md:flex-row items-center justify-between">
-            <div class="md:w-1/2 text-center md:text-left mb-10 md:mb-0">
-                <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4">
-                    Escultura Realista Com Sua Foto
-                </h1>
-                <p class="text-lg md:text-2xl font-medium mb-6">
-                    Feita à Mão Pela <span class="text-brown-light">Dona Elma ❤️</span>
-                </p>
-                <p class="text-base md:text-xl leading-relaxed mb-8">
-                    Transforme suas memórias em arte feita com paixão e técnica. Cada peça é única, esculpida com dedicação e atenção aos detalhes por uma artista profissional.
-                </p>
-                <a href="#prices" class="inline-block px-8 py-3 bg-brown-custom text-white font-bold rounded-full shadow-lg transition duration-300 ease-in-out hover:bg-brown-light transform hover:scale-105">
-                    Quero minha miniatura →
-                </a>
-            </div>
-            <div class="md:w-1/2 flex justify-center">
-                <div class="w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl">
-                    <img src="https://iili.io/KHLGPdg.jpg" alt="Dona Elma com suas criações" class="w-full h-auto" onerror="this.onerror=null;this.src='https://placehold.co/400x500/f7f3f2/4b3832?text=Dona+Elma';">
-                </div>
-            </div>
-        </section>
-
-        <!-- About Section with Scrollable Gallery -->
-        <section id="about" class="bg-white p-8 md:p-12 mt-20 rounded-3xl shadow-lg">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">
-                38 anos de paixão pela arte e um talento único para eternizar memórias
-            </h2>
-            <p class="text-lg md:text-xl text-center mb-8">
-                Elma não é apenas uma artista – é uma mulher que descobriu sua vocação aos 25 anos e desde então dedica sua vida a transformar fotografias em obras de arte que tocam o coração.
-            </p>
-            <div class="md:flex md:items-center">
-                <div class="md:w-1/2 pr-0 md:pr-10 mb-6 md:mb-0">
-                    <blockquote class="text-lg md:text-xl font-medium italic text-gray-700 p-4 border-l-4 border-brown-custom bg-gray-50 rounded-lg">
-                        "Cada escultura que crio carrega uma história única. Meu objetivo é fazer com que as pessoas se reconheçam e se emocionem ao ver sua essência materializada em arte."
-                    </blockquote>
-                    <p class="text-right text-base font-semibold mt-2">— Dona Elma</p>
-                </div>
-                <div class="md:w-1/2">
-                    <p class="text-base md:text-lg leading-relaxed">
-                        Formada em Artes Visuais, Elma combina técnica acadêmica com sensibilidade artística, criando esculturas que capturam não apenas a aparência física, mas a alma e personalidade de cada pessoa retratada.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Gallery Section with horizontal scroll -->
-            <div id="about-gallery-wrapper" class="relative mt-12">
-                <h3 class="text-2xl font-bold text-center mb-6">Nossas Esculturas em Detalhes</h3>
-                <div id="about-gallery" class="gallery-container flex overflow-x-scroll snap-x snap-mandatory pb-4 space-x-4 scrollbar-hide">
-                    <img src="https://iili.io/KHL0vzN.png" alt="Escultura detalhada de uma pessoa" class="gallery-image rounded-xl shadow-md flex-shrink-0 snap-center" onerror="this.onerror=null;this.src='https://placehold.co/256x256/f7f3f2/4b3832?text=Escultura+1';">
-                    <img src="https://iili.io/KHL0ebp.png" alt="Miniatura de um casal em detalhe" class="gallery-image rounded-xl shadow-md flex-shrink-0 snap-center" onerror="this.onerror=null;this.src='https://placehold.co/256x256/f7f3f2/4b3832?text=Escultura+2';">
-                    <img src="https://iili.io/KHL08XI.jpg" alt="Escultura de uma pessoa segurando um objeto" class="gallery-image rounded-xl shadow-md flex-shrink-0 snap-center" onerror="this.onerror=null;this.src='https://placehold.co/256x256/f7f3f2/4b3832?text=Escultura+3';">
-                    <img src="https://iili.io/KHL0N5v.jpg" alt="Escultura com traços realistas" class="gallery-image rounded-xl shadow-md flex-shrink-0 snap-center" onerror="this.onerror=null;this.src='https://placehold.co/256x256/f7f3f2/4b3832?text=Escultura+4';">
-                    <img src="https://iili.io/KHL0i7f.png" alt="Miniatura de um casal sorrindo" class="gallery-image rounded-xl shadow-md flex-shrink-0 snap-center" onerror="this.onerror=null;this.src='https://placehold.co/256x256/f7f3f2/4b3832?text=Escultura+5';">
-                    <img src="https://iili.io/KHL0r1n.png" alt="Escultura de uma mulher em uma pose específica" class="gallery-image rounded-xl shadow-md flex-shrink-0 snap-center" onerror="this.onerror=null;this.src='https://placehold.co/256x256/f7f3f2/4b3832?text=Escultura+6';">
-                    <img src="https://iili.io/KHL04gs.jpg" alt="Escultura de corpo inteiro com detalhes" class="gallery-image rounded-xl shadow-md flex-shrink-0 snap-center" onerror="this.onerror=null;this.src='https://placehold.co/256x256/f7f3f2/4b3832?text=Escultura+7';">
-                    <img src="https://iili.io/KHL0OeR.jpg" alt="Miniatura de um homem com barba" class="gallery-image rounded-xl shadow-md flex-shrink-0 snap-center" onerror="this.onerror=null;this.src='https://placehold.co/256x256/f7f3f2/4b3832?text=Escultura+8';">
-                    <img src="https://iili.io/KHL0Sst.png" alt="Miniatura de um homem mais velho" class="gallery-image rounded-xl shadow-md flex-shrink-0 snap-center" onerror="this.onerror=null;this.src='https://placehold.co/256x256/f7f3f2/4b3832?text=Escultura+9';">
-                </div>
-                <button id="about-prev-btn" class="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-gray-800/50 text-white hover:bg-gray-800/75 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
-                </button>
-                <button id="about-next-btn" class="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-gray-800/50 text-white hover:bg-gray-800/75 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-                </button>
-            </div>
-        </section>
-
-        <!-- Pricing Section -->
-        <section id="prices" class="bg-white p-8 md:p-12 mt-20 rounded-3xl shadow-lg text-center">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4 text-brown-custom">
-                Escolha Quantas Esculturas Deseja
-            </h2>
-            <p class="text-lg mb-8 text-gray-700">
-                Cada escultura é feita à mão e com muito carinho, registrando para sempre momentos e pessoas especiais.
-            </p>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div class="price-card pricing-option p-6 bg-white rounded-2xl shadow-md transition duration-300 ease-in-out cursor-pointer relative hover:shadow-xl hover:scale-105 hover:-translate-y-1" data-quantity="1" data-price="81.48" data-save="45">
-                    <div class="flex flex-col items-center">
-                        <span class="text-4xl font-bold text-brown-custom">1</span>
-                        <span class="text-lg font-semibold text-gray-700">Escultura</span>
-                        <div class="mt-4 text-center">
-                            <p class="text-xl font-bold text-brown-custom">R$81,48</p>
-                            <p class="text-xs text-green-600 font-semibold">Economize 45%</p>
-                        </div>
-                    </div>
-                    <span class="check-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" /></svg></span>
-                </div>
-                <div class="price-card pricing-option p-6 bg-white rounded-2xl shadow-md transition duration-300 ease-in-out cursor-pointer relative hover:shadow-xl hover:scale-105 hover:-translate-y-1" data-quantity="2" data-price="145.08" data-save="55">
-                    <div class="flex flex-col items-center">
-                        <span class="text-4xl font-bold text-brown-custom">2</span>
-                        <span class="text-lg font-semibold text-gray-700">Esculturas</span>
-                        <div class="mt-4 text-center">
-                            <p class="text-xl font-bold text-brown-custom">R$145,08</p>
-                            <p class="text-xs text-green-600 font-semibold">Economize 55%</p>
-                        </div>
-                    </div>
-                    <span class="check-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" /></svg></span>
-                </div>
-                <div class="price-card pricing-option p-6 bg-white rounded-2xl shadow-md transition duration-300 ease-in-out cursor-pointer relative hover:shadow-xl hover:scale-105 hover:-translate-y-1" data-quantity="3" data-price="193.08" data-save="58">
-                    <div class="flex flex-col items-center">
-                        <span class="text-4xl font-bold text-brown-custom">3</span>
-                        <span class="text-lg font-semibold text-gray-700">Esculturas</span>
-                        <div class="mt-4 text-center">
-                            <p class="text-xl font-bold text-brown-custom">R$193,08</p>
-                            <p class="text-xs text-green-600 font-semibold">Economize 58%</p>
-                        </div>
-                    </div>
-                    <span class="check-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" /></svg></span>
-                </div>
-                <div class="price-card pricing-option p-6 bg-white rounded-2xl shadow-md transition duration-300 ease-in-out cursor-pointer relative hover:shadow-xl hover:scale-105 hover:-translate-y-1" data-quantity="4" data-price="241.08" data-save="62">
-                    <div class="flex flex-col items-center">
-                        <span class="text-4xl font-bold text-brown-custom">4</span>
-                        <span class="text-lg font-semibold text-gray-700">Esculturas</span>
-                        <div class="mt-4 text-center">
-                            <p class="text-xl font-bold text-brown-custom">R$241,08</p>
-                            <p class="text-xs text-green-600 font-semibold">Economize 62%</p>
-                        </div>
-                    </div>
-                    <span class="check-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" /></svg></span>
-                </div>
-            </div>
-
-            <!-- Total price section -->
-            <div class="bg-gray-50 p-6 rounded-2xl shadow-inner max-w-md mx-auto mt-8">
-                <div class="flex justify-between items-center bg-gray-200 p-3 rounded-xl">
-                    <span class="text-lg font-bold text-brown-custom">Valor Total:</span>
-                    <span id="final-price" class="text-2xl font-bold text-brown-custom">R$81,48</span>
-                </div>
-                <button id="checkout-button" class="block w-full px-10 py-4 mt-6 bg-green-600 text-white font-bold rounded-full shadow-lg transition duration-300 ease-in-out hover:bg-green-700 transform hover:scale-105">Finalizar Pedido →</button>
-                <p class="text-xs text-center mt-4 font-semibold text-gray-600">
-                    O pagamento e o envio das fotos serão combinados pelo WhatsApp.
-                </p>
-            </div>
-        </section>
-
-        <!-- O restante do seu HTML continua aqui... -->
-        <!-- How it Works Section -->
-        <section id="how-it-works" class="p-8 md:p-12 mt-20 rounded-3xl">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">
-                Como Funciona
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
-                <div class="p-6 bg-white rounded-xl shadow-lg">
-                    <div class="text-4xl font-bold mb-2 text-brown-light">1.</div>
-                    <h3 class="text-xl font-semibold mb-2">Escolha e Inicie o Pedido</h3>
-                    <p>Selecione quantas esculturas deseja e inicie seu pedido com segurança.</p>
-                </div>
-                <div class="p-6 bg-white rounded-xl shadow-lg">
-                    <div class="text-4xl font-bold mb-2 text-brown-light">2.</div>
-                    <h3 class="text-xl font-semibold mb-2">Contato via WhatsApp</h3>
-                    <p>Você será direcionado para o WhatsApp para combinar o pagamento e o envio das fotos.</p>
-                </div>
-                <div class="p-6 bg-white rounded-xl shadow-lg">
-                    <div class="text-4xl font-bold mb-2 text-brown-light">3.</div>
-                    <h3 class="text-xl font-semibold mb-2">Produção Artística</h3>
-                    <p>Elma esculpe à mão cada detalhe da sua miniatura com técnica e paixão.</p>
-                </div>
-                <div class="p-6 bg-white rounded-xl shadow-lg">
-                    <div class="text-4xl font-bold mb-2 text-brown-light">4.</div>
-                    <h3 class="text-xl font-semibold mb-2">Receba em Casa</h3>
-                    <p>Sua escultura chega bem embalada, pronta para emocionar.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Process Section -->
-        <section id="process" class="p-8 md:p-12 mt-20 rounded-3xl bg-white shadow-lg">
-            <div class="flex flex-col md:flex-row items-center gap-10">
-                <div class="md:w-1/2 flex flex-col justify-center">
-                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Veja o Processo de Criação</h2>
-                    <p class="text-lg mb-8">Cada escultura leva em média 5 horas para ser finalizada. Dona Elma utiliza técnicas refinadas desenvolvidas ao longo de 38 anos de experiência, capturando a essência e as características únicas de cada pessoa.</p>
-                    <div class="space-y-6">
-                        <div class="flex items-start space-x-4">
-                            <div class="w-8 h-8 flex items-center justify-center rounded-full bg-brown-light text-white font-bold flex-shrink-0">1</div>
-                            <div>
-                                <h3 class="font-bold text-lg">Análise detalhada da fotografia</h3>
-                                <p class="text-sm text-gray-700">Estudo cuidadoso de cada detalhe da imagem enviada</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start space-x-4">
-                            <div class="w-8 h-8 flex items-center justify-center rounded-full bg-brown-light text-white font-bold flex-shrink-0">2</div>
-                            <div>
-                                <h3 class="font-bold text-lg">Modelagem inicial do esboço</h3>
-                                <p class="text-sm text-gray-700">Criação da estrutura básica que dará forma à escultura</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start space-x-4">
-                            <div class="w-8 h-8 flex items-center justify-center rounded-full bg-brown-light text-white font-bold flex-shrink-0">3</div>
-                            <div>
-                                <h3 class="font-bold text-lg">Esculpimento dos traços faciais</h3>
-                                <p class="text-sm text-gray-700">Trabalho minucioso para capturar a expressão única de cada pessoa</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start space-x-4">
-                            <div class="w-8 h-8 flex items-center justify-center rounded-full bg-brown-light text-white font-bold flex-shrink-0">4</div>
-                            <div>
-                                <h3 class="font-bold text-lg">Pintura artesanal personalizada</h3>
-                                <p class="text-sm text-gray-700">Aplicação de cores e detalhes que dão vida à miniatura</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start space-x-4">
-                            <div class="w-8 h-8 flex items-center justify-center rounded-full bg-brown-light text-white font-bold flex-shrink-0">5</div>
-                            <div>
-                                <h3 class="font-bold text-lg">Secagem e finalização com verniz</h3>
-                                <p class="text-sm text-gray-700">Proteção especial que garante durabilidade à escultura</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="md:w-1/2 w-full mt-8 md:mt-0">
-                    <div id="process-gallery-wrapper" class="relative">
-                        <div id="process-gallery" class="gallery-container flex overflow-x-scroll snap-x snap-mandatory pb-4 space-x-4 rounded-3xl shadow-2xl scrollbar-hide">
-                            <img src="https://iili.io/KHQ2DtS.jpg" alt="Miniatura de uma pessoa com uma camiseta listrada" class="gallery-image rounded-3xl flex-shrink-0 snap-center" onerror="this.onerror=null;this.src='https://placehold.co/256x256/f7f3f2/4b3832?text=Processo+1';">
-                            <img src="https://iili.io/KHQ2pV9.jpg" alt="Miniatura de um casal, mostrando a escultura do processo de criação" class="gallery-image rounded-3xl flex-shrink-0 snap-center" onerror="this.onerror=null;this.src='https://placehold.co/256x256/f7f3f2/4b3832?text=Processo+2';">
-                            <img src="https://iili.io/KHQ2Q94.jpg" alt="Mão de um artista trabalhando em um busto de miniatura" class="gallery-image rounded-3xl flex-shrink-0 snap-center" onerror="this.onerror=null;this.src='https://placehold.co/256x256/f7f3f2/4b3832?text=Processo+3';">
-                            <img src="https://iili.io/KHQ2icG.jpg" alt="Mão de um artista pintando um rosto de miniatura" class="gallery-image rounded-3xl flex-shrink-0 snap-center" onerror="this.onerror=null;this.src='https://placehold.co/256x256/f7f3f2/4b3832?text=Processo+4';">
-                        </div>
-                        <button id="process-prev-btn" class="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-gray-800/50 text-white hover:bg-gray-800/75 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
-                        </button>
-                        <button id="process-next-btn" class="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-gray-800/50 text-white hover:bg-gray-800/75 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Why Us Section -->
-        <section id="why-us" class="p-8 md:p-12 mt-20 rounded-3xl">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Por Que Escolher Nossas Esculturas</h2>
-            <p class="text-lg text-center mb-10">A combinação perfeita entre arte, emoção e qualidade</p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="p-6 bg-white rounded-xl shadow-lg text-center">
-                    <span class="text-4xl">❤️</span>
-                    <h3 class="text-xl font-semibold my-2">Feito à mão por uma avó de verdade</h3>
-                    <p>Cada peça é criada pela Dona Elma com a sensibilidade e carinho que só uma avó pode oferecer.</p>
-                </div>
-                <div class="p-6 bg-white rounded-xl shadow-lg text-center">
-                    <span class="text-4xl">✨</span>
-                    <h3 class="text-xl font-semibold my-2">Hiper-realismo nos traços e expressões</h3>
-                    <p>Detalhes impressionantes que capturam a essência e personalidade de cada pessoa retratada.</p>
-                </div>
-                <div class="p-6 bg-white rounded-xl shadow-lg text-center">
-                    <span class="text-4xl">🔷</span>
-                    <h3 class="text-xl font-semibold my-2">Material ResinCryl durável e bonito</h3>
-                    <p>Fórmula exclusiva que garante acabamento fino e resistência por anos.</p>
-                </div>
-                <div class="p-6 bg-white rounded-xl shadow-lg text-center">
-                    <span class="text-4xl">📏</span>
-                    <h3 class="text-xl font-semibold my-2">Tamanho de 12 a 15 cm</h3>
-                    <p>Proporção perfeita para exibir com orgulho ou presentear alguém especial.</p>
-                </div>
-                <div class="p-6 bg-white rounded-xl shadow-lg text-center">
-                    <span class="text-4xl">🎁</span>
-                    <h3 class="text-xl font-semibold my-2">Presente com significado profundo</h3>
-                    <p>Muito além de um objeto, é uma forma de eternizar memórias e afetos.</p>
-                </div>
-                <div class="p-6 bg-white rounded-xl shadow-lg text-center">
-                    <span class="text-4xl">✅</span>
-                    <h3 class="text-xl font-semibold my-2">Garantia de 30 dias para defeitos</h3>
-                    <p>Confiamos tanto na qualidade que oferecemos garantia completa contra defeitos de fabricação.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Call to Action -->
-        <section class="bg-brown-custom text-white p-8 md:p-12 mt-20 rounded-3xl shadow-lg text-center">
-            <h2 class="text-2xl md:text-3xl font-bold mb-4">Peça feita com exclusividade para você</h2>
-            <p class="text-lg mb-8">Cada escultura é uma criação única, feita especialmente para aquela foto e aquele momento. Não usamos moldes ou peças pré-fabricadas – cada detalhe é esculpido à mão com dedicação.</p>
-            <a href="#prices" class="inline-block px-8 py-3 bg-white text-brown-custom font-bold rounded-full shadow-lg transition duration-300 ease-in-out hover:bg-gray-200 transform hover:scale-105">
-                Quero uma escultura personalizada →
+            <a href="#" class="flex flex-col items-center text-gray-500 hover:text-pink-600 w-1/4">
+                <i data-feather="search" class="w-6 h-6"></i>
+                <span class="text-xs">Buscar</span>
             </a>
-        </section>
-
-        <!-- Testimonials Section -->
-        <section id="testimonials" class="p-8 md:p-12 mt-20 rounded-3xl">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-10">O Que Nossos Clientes Dizem</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
-                    <img src="https://iili.io/KHZzAlV.webp" alt="Foto da escultura de José Carlos" class="w-full h-auto rounded-xl mb-4" onerror="this.onerror=null;this.src='https://placehold.co/400x300/f7f3f2/4b3832?text=Depoimento+1';">
-                    <p class="text-lg font-medium italic mb-4">"Presenteei meu pai com uma miniatura dele tocando violão, seu hobby favorito. A Dona Elma capturou cada detalhe, desde a expressão até a postura. Ele se emocionou ao ver a arte e agora a exibe com orgulho na estante da sala."</p>
-                    <div class="flex items-center space-x-4">
-                        <img src="https://iili.io/KHZaiml.png" alt="Foto de José Carlos" class="w-12 h-12 rounded-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/48x48/f7f3f2/4b3832?text=JC';">
-                        <div>
-                            <p class="font-bold">José Carlos</p>
-                            <p class="text-sm">Fortaleza, CE</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
-                    <img src="https://iili.io/KHZzIix.webp" alt="Foto da escultura de Ricardo Silva" class="w-full h-auto rounded-xl mb-4" onerror="this.onerror=null;this.src='https://placehold.co/400x300/f7f3f2/4b3832?text=Depoimento+2';">
-                    <p class="text-lg font-medium italic mb-4">"Comprei como presente para mim mesmo, uma miniatura tocando violão durante meus treinos. A qualidade é impressionante! Cada detalhe da minha expressão e até mesmo o logo da minha camiseta estão perfeitos. Um trabalho excepcional."</p>
-                    <div class="flex items-center space-x-4">
-                        <img src="https://iili.io/KHZaFls.png" alt="Foto de Ricardo Silva" class="w-12 h-12 rounded-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/48x48/f7f3f2/4b3832?text=RS';">
-                        <div>
-                            <p class="font-bold">Ricardo Silva</p>
-                            <p class="text-sm">São Paulo, SP</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
-                    <img src="https://iili.io/KHZzuKQ.webp" alt="Foto da escultura de Antônio e Maria" class="w-full h-auto rounded-xl mb-4" onerror="this.onerror=null;this.src='https://placehold.co/400x300/f7f3f2/4b3832?text=Depoimento+3';">
-                    <p class="text-lg font-medium italic mb-4">"Encomendei esta miniatura para celebrar 50 anos de casamento com minha esposa. A Dona Elma conseguiu capturar o carinho e o amor que compartilhamos por tantos anos. Todos os nossos filhos e netos se emocionaram com este presente tão especial."</p>
-                    <div class="flex items-center space-x-4">
-                        <img src="https://iili.io/KHZ1tuj.png" alt="Foto de Antônio e Maria" class="w-12 h-12 rounded-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/48x48/f7f3f2/4b3832?text=AM';">
-                        <div>
-                            <p class="font-bold">Antônio e Maria</p>
-                            <p class="text-sm">Recife, PE</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="text-center mt-8">
-                <a href="#" class="text-brown-custom font-semibold hover:underline">Ver mais depoimentos no Instagram</a>
-            </div>
-        </section>
-
-        <!-- FAQ Section -->
-        <section id="faq" class="bg-white p-8 md:p-12 mt-20 rounded-3xl shadow-lg">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-10">Perguntas Frequentes</h2>
-            <div class="space-y-4 max-w-2xl mx-auto">
-                <div class="faq-item p-4 rounded-xl border border-gray-200">
-                    <input type="checkbox" id="faq-1">
-                    <label for="faq-1" class="flex justify-between items-center cursor-pointer">
-                        <span class="font-semibold text-lg text-brown-custom">Qual o material da escultura?</span>
-                        <span class="faq-icon transition-transform transform"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg></span>
-                    </label>
-                    <div class="faq-content text-gray-700"><p>As esculturas são feitas de ResinCryl, uma fórmula exclusiva desenvolvida pela Dona Elma que garante durabilidade, leveza e um acabamento incrivelmente realista.</p></div>
-                </div>
-                <div class="faq-item p-4 rounded-xl border border-gray-200">
-                    <input type="checkbox" id="faq-2">
-                    <label for="faq-2" class="flex justify-between items-center cursor-pointer">
-                        <span class="font-semibold text-lg text-brown-custom">Quanto tempo demora para a escultura ficar pronta?</span>
-                        <span class="faq-icon transition-transform transform"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg></span>
-                    </label>
-                    <div class="faq-content text-gray-700"><p>O tempo de produção varia de acordo com o pedido, mas geralmente leva entre 7 e 15 dias úteis. Adicione o tempo de envio para o prazo total.</p></div>
-                </div>
-                <div class="faq-item p-4 rounded-xl border border-gray-200">
-                    <input type="checkbox" id="faq-3">
-                    <label for="faq-3" class="flex justify-between items-center cursor-pointer">
-                        <span class="font-semibold text-lg text-brown-custom">Posso pedir uma miniatura de um animal de estimação?</span>
-                        <span class="faq-icon transition-transform transform"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg></span>
-                    </label>
-                    <div class="faq-content text-gray-700"><p>Sim! A Dona Elma também é especialista em capturar a personalidade de cães, gatos e outros pets. Envie uma foto do seu melhor amigo e eternize essa amizade.</p></div>
-                </div>
-                <div class="faq-item p-4 rounded-xl border border-gray-200">
-                    <input type="checkbox" id="faq-4">
-                    <label for="faq-4" class="flex justify-between items-center cursor-pointer">
-                        <span class="font-semibold text-lg text-brown-custom">Onde eu envio a minha foto?</span>
-                        <span class="faq-icon transition-transform transform"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg></span>
-                    </label>
-                    <div class="faq-content text-gray-700"><p>Após a confirmação da compra, você receberá um e-mail com as instruções detalhadas para o envio das fotos e outras informações importantes para a produção da sua escultura.</p></div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-brown-custom text-white py-8 mt-20 rounded-t-[40px]">
-        <div class="container mx-auto px-6 text-center">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-                <a href="#" class="text-2xl font-bold mb-4 md:mb-0">Dona Elma Esculturas</a>
-                <div class="flex space-x-6">
-                    <a href="#" class="text-gray-300 hover:text-white transition-colors">Instagram</a>
-                    <a href="#" class="text-gray-300 hover:text-white transition-colors">Facebook</a>
-                    <a href="#" class="text-gray-300 hover:text-white transition-colors">TikTok</a>
-                </div>
-            </div>
-            <p class="text-sm text-gray-400">&copy; 2024 Dona Elma Esculturas. Todos os direitos reservados.</p>
-        </div>
-    </footer>
-
-    <!-- Botão flutuante do WhatsApp -->
-    <a href="https://wa.me/55981165843" class="whatsapp-float" target="_blank" rel="noopener noreferrer">
-        <img src="https://iili.io/KJB9x6X.webp" alt="Contato por WhatsApp" />
-    </a>
-
-    <!-- NOVO: Modal para coletar informações do cliente -->
-    <div id="user-info-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
-        <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md mx-4">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-brown-custom">Quase lá!</h2>
-                <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-8 h-8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            <p class="text-gray-700 mb-6">Por favor, preencha seus dados para continuar o pedido no WhatsApp.</p>
-            <form id="user-info-form">
-                <div class="mb-4">
-                    <label for="user-name" class="block text-brown-custom font-semibold mb-2">Nome Completo</label>
-                    <input type="text" id="user-name" name="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown-custom focus:border-brown-custom" required>
-                </div>
-                <div class="mb-6">
-                    <label for="user-email" class="block text-brown-custom font-semibold mb-2">Email</label>
-                    <input type="email" id="user-email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown-custom focus:border-brown-custom" required>
-                </div>
-                <button type="submit" id="submit-whatsapp-btn" class="w-full px-10 py-4 bg-green-600 text-white font-bold rounded-full shadow-lg transition duration-300 ease-in-out hover:bg-green-700 transform hover:scale-105">
-                    Enviar Pedido para o WhatsApp →
-                </button>
-            </form>
-        </div>
+            <a href="#" class="flex flex-col items-center text-gray-500 hover:text-pink-600 w-1/4">
+                <i data-feather="shopping-bag" class="w-6 h-6"></i>
+                <span class="text-xs">Pedidos</span>
+            </a>
+            <a href="#" class="flex flex-col items-center text-gray-500 hover:text-pink-600 w-1/4">
+                <i data-feather="user" class="w-6 h-6"></i>
+                <span class="text-xs">Perfil</span>
+            </a>
+        </footer>
     </div>
 
     <script>
-        // Função para formatar o número como moeda brasileira
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- REMOVIDO: Lógica do Stripe ---
-
-            const checkoutButton = document.getElementById('checkout-button');
-            const pricingOptions = document.querySelectorAll('.pricing-option');
-            const finalPriceElement = document.getElementById('final-price');
-            
-            // --- NOVO: Elementos do Modal ---
-            const userInfoModal = document.getElementById('user-info-modal');
-            const closeModalBtn = document.getElementById('close-modal-btn');
-            const userInfoForm = document.getElementById('user-info-form');
-            const userNameInput = document.getElementById('user-name');
-            const userEmailInput = document.getElementById('user-email');
-
-            // Função para atualizar o preço total
-            const updatePrices = () => {
-                const selectedOption = document.querySelector('.pricing-option.selected');
-                if (!selectedOption) return;
-                let price = parseFloat(selectedOption.dataset.price);
-                finalPriceElement.textContent = formatCurrency(price);
-            };
-
-            // Evento para abrir o modal ao clicar em "Finalizar Pedido"
-            checkoutButton.addEventListener('click', () => {
-                userInfoModal.classList.remove('hidden');
-            });
-
-            // Eventos para fechar o modal
-            closeModalBtn.addEventListener('click', () => {
-                userInfoModal.classList.add('hidden');
-            });
-            userInfoModal.addEventListener('click', (event) => {
-                if (event.target === userInfoModal) {
-                    userInfoModal.classList.add('hidden');
-                }
-            });
-
-            // Evento para enviar o formulário e redirecionar para o WhatsApp
-            userInfoForm.addEventListener('submit', (event) => {
-                event.preventDefault(); // Impede o envio padrão do formulário
-
-                const selectedOption = document.querySelector('.pricing-option.selected');
-                if (!selectedOption) {
-                    console.error("Erro: Nenhuma opção de preço selecionada.");
-                    return;
-                }
-                
-                // Coleta todos os dados
-                const quantity = parseInt(selectedOption.dataset.quantity, 10);
-                const finalPriceText = finalPriceElement.textContent;
-                const productName = quantity > 1 ? `${quantity} Esculturas` : `${quantity} Escultura`;
-                const userName = userNameInput.value;
-                const userEmail = userEmailInput.value;
-
-                // Monta a mensagem final
-                const message = `*Novo Pedido Criado*\n\n*Produto:* ${productName}\n*Valor:* ${finalPriceText}\n\n*Dados do Cliente*\n*Nome:* ${userName}\n*Email:* ${userEmail}`;
-                
-                const whatsappUrl = `https://wa.me/55981165843?text=${encodeURIComponent(message)}`;
-                
-                // Abre o link do WhatsApp e esconde o modal
-                window.open(whatsappUrl, '_blank');
-                userInfoModal.classList.add('hidden');
-            });
-
-            // Lógica original para seleção de preço
-            pricingOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    pricingOptions.forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
-                    updatePrices();
-                });
-            });
-            
-            if(pricingOptions.length > 0) {
-                pricingOptions[0].classList.add('selected');
-            }
-            updatePrices();
-
-            // Lógica original da galeria
-            const setupGallery = (galleryId, prevBtnId, nextBtnId) => {
-                const gallery = document.getElementById(galleryId);
-                const prevBtn = document.getElementById(prevBtnId);
-                const nextBtn = document.getElementById(nextBtnId);
-
-                if (gallery && prevBtn && nextBtn) {
-                    const scrollAmount = 256 + 16;
-                    prevBtn.addEventListener('click', () => gallery.scrollBy({ left: -scrollAmount, behavior: 'smooth' }));
-                    nextBtn.addEventListener('click', () => gallery.scrollBy({ left: scrollAmount, behavior: 'smooth' }));
-                }
-            };
-            
-            setupGallery('about-gallery', 'about-prev-btn', 'about-next-btn');
-            setupGallery('process-gallery', 'process-prev-btn', 'process-next-btn');
-        });
+        // Inicializa os ícones do Feather Icons
+        feather.replace();
     </script>
+
 </body>
 </html>
