@@ -9,13 +9,30 @@ const PORT = process.env.PORT || 3000;
 
 // --- CONFIGURAÇÃO IMPORTANTE ---
 // Configura o SDK do Mercado Pago com a sua chave secreta (Access Token)
-// A chave será lida de uma variável de ambiente no Render para segurança
 mercadopago.configure({
   access_token: process.env.MP_ACCESS_TOKEN
 });
 
-// Configurações do servidor (Middlewares)
-app.use(cors());
+// --- CORREÇÃO DO CORS ---
+// Lista de domínios permitidos a aceder a este servidor
+const dominiosPermitidos = [
+  'https://donaelma.com', 
+  'http://127.0.0.1:5500' // Adicionado para testes locais, se necessário
+];
+
+const opcoesCors = {
+  origin: function (origin, callback) {
+    // Permite pedidos sem 'origin' (como apps mobile ou Postman) ou se o domínio estiver na lista
+    if (!origin || dominiosPermitidos.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Não permitido pelo CORS'));
+    }
+  }
+};
+
+// Habilita o CORS com as opções específicas
+app.use(cors(opcoesCors));
 app.use(express.json());
 
 // Rota principal para testar
@@ -28,13 +45,18 @@ app.post('/criar-pagamento', async (req, res) => {
   try {
     const { valor, info } = req.body;
 
-    // Cria um objeto com os dados do pagamento
+    // Validação básica para garantir que o token está configurado
+    if (!process.env.MP_ACCESS_TOKEN) {
+        console.error('ACCESS TOKEN do Mercado Pago não está configurado no Render.');
+        return res.status(500).json({ error: 'Erro de configuração do servidor.' });
+    }
+
     const payment_data = {
       transaction_amount: Number(valor),
       description: info,
       payment_method_id: 'pix',
       payer: {
-        email: 'cliente@email.com', // Email genérico, pode ser melhorado depois
+        email: 'cliente@email.com',
         first_name: 'Cliente',
         last_name: 'Dona Elma',
         address: {
@@ -48,22 +70,20 @@ app.post('/criar-pagamento', async (req, res) => {
       }
     };
 
-    // Cria o pagamento usando o SDK
     const data = await mercadopago.payment.create(payment_data);
 
-    // Extrai os dados do PIX da resposta
     const qrCodeBase64 = data.body.point_of_interaction.transaction_data.qr_code_base64;
     const copiaECola = data.body.point_of_interaction.transaction_data.qr_code;
 
-    // Envia os dados de volta para o site
     res.json({
       qrCodeBase64,
       copiaECola
     });
 
   } catch (error) {
-    console.error('Erro ao criar pagamento PIX:', error);
-    res.status(500).json({ error: 'Falha ao gerar o PIX.' });
+    console.error('Erro ao criar pagamento PIX:', error.message);
+    // Envia uma mensagem de erro mais detalhada para o front-end
+    res.status(500).json({ error: 'Falha ao gerar o PIX. Verifique as credenciais e os dados do pagamento.' });
   }
 });
 
