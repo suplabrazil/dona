@@ -56,7 +56,7 @@ app.post('/criar-pagamento', async (req, res) => {
       description: info,
       payment_method_id: 'pix',
       payer: {
-        email: 'cliente@email.com',
+        email: 'test_user_123456@testuser.com', // E-mail de teste VÁLIDO exigido pelo MP
         first_name: 'Cliente',
         last_name: 'Dona Elma',
         address: {
@@ -70,7 +70,11 @@ app.post('/criar-pagamento', async (req, res) => {
       }
     };
 
+    console.log("A enviar os seguintes dados para o Mercado Pago:", JSON.stringify(payment_data, null, 2));
+
     const data = await mercadopago.payment.create(payment_data);
+    
+    console.log("Resposta recebida do Mercado Pago com sucesso.");
 
     const qrCodeBase64 = data.body.point_of_interaction.transaction_data.qr_code_base64;
     const copiaECola = data.body.point_of_interaction.transaction_data.qr_code;
@@ -81,9 +85,18 @@ app.post('/criar-pagamento', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Erro ao criar pagamento PIX:', error.message);
+    // Log detalhado do erro no console do servidor (Render)
+    console.error('--- ERRO DETALHADO AO CRIAR PAGAMENTO PIX ---');
+    if (error.response) {
+      console.error('Status:', error.response.status);
+      console.error('Data:', JSON.stringify(error.response.data, null, 2));
+    } else {
+      console.error('Mensagem de erro:', error.message);
+    }
+    console.error('---------------------------------------------');
+
     // Envia uma mensagem de erro mais detalhada para o front-end
-    res.status(500).json({ error: 'Falha ao gerar o PIX. Verifique as credenciais e os dados do pagamento.' });
+    res.status(500).json({ error: 'Falha ao comunicar com o gateway de pagamento. Verifique os logs do servidor.' });
   }
 });
 
