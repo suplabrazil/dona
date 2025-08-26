@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elma Doces - Cardápio</title>
+    <title>Dona Elma - Cardápio</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,125 +17,239 @@
     <script src="https://unpkg.com/feather-icons"></script>
 
     <style>
-        /* Estilo customizado para a fonte Inter */
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* Para garantir que a barra de navegação não sobreponha o conteúdo final */
         main {
             padding-bottom: 80px;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #e83e8c;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body class="bg-gray-50">
 
     <!-- Container principal que simula a tela de um celular -->
-    <div class="max-w-sm mx-auto bg-white min-h-screen shadow-lg">
+    <div id="app-container" class="max-w-sm mx-auto bg-white min-h-screen shadow-lg relative">
         
-        <!-- Cabeçalho com imagem de banner -->
         <header>
-            <div class="h-32 bg-cover bg-center" style="background-image: url('https://iili.io/KJsfN6v.png')">
-                <!-- Imagem de fundo dos doces -->
-            </div>
+            <div class="h-32 bg-cover bg-center" style="background-image: url('https://iili.io/KJsfN6v.png')"></div>
             <div class="p-4 bg-white">
                 <div class="flex items-center space-x-4">
-                    <!-- Logo da loja -->
-                    <img src="https://iili.io/KJsFwDg.png" alt="Logo Elma Doces" class="w-16 h-16 rounded-full border-2 border-white -mt-10 shadow-md">
-                    <div>
-                        <h1 class="text-2xl font-bold text-gray-800">Elma Doces</h1>
-                        <p class="text-sm text-pink-600 font-semibold cursor-pointer">Ver mais</p>
+                    <img src="https://iili.io/KJsFwDg.png" alt="Logo Dona Elma" class="w-24 h-24 rounded-full -mt-12 shadow-md">
+                    <div class="flex-1 pt-2">
+                        <h1 class="text-2xl font-bold text-gray-800">Dona Elma</h1>
+                        <div class="flex items-center space-x-2">
+                            <p class="text-sm text-pink-600 font-semibold cursor-pointer" id="ver-mais-btn">Ver mais</p>
+                            <div class="flex items-center text-sm text-gray-600 cursor-pointer" id="reviews-btn">
+                                <i data-feather="star" class="w-4 h-4 text-yellow-500 fill-current"></i>
+                                <span class="font-bold ml-1">4.8</span>
+                                <span class="text-gray-500 ml-1">(264)</span>
+                            </div>
+                        </div>
                         <p class="text-xs text-gray-500 mt-1">Pedido mínimo R$ 15,00</p>
                     </div>
                 </div>
             </div>
         </header>
 
-        <main class="p-4">
-            <!-- Barra de busca -->
-            <div class="relative mb-4">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <i data-feather="search" class="w-5 h-5 text-gray-400"></i>
-                </span>
-                <input type="text" placeholder="Buscar no cardápio" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-pink-400">
-            </div>
-
-            <!-- Informações de entrega -->
-            <div class="flex justify-between items-center border border-gray-200 rounded-lg p-3 mb-6">
-                <div class="flex items-center space-x-3">
-                    <i data-feather="clock" class="w-5 h-5 text-gray-600"></i>
-                    <span class="text-gray-800 font-medium">Entrega</span>
-                </div>
-                <div class="text-right">
-                    <p class="font-semibold text-gray-800">Hoje</p>
-                    <p class="text-xs text-gray-500">30-45 min • R$ 5,00</p>
-                </div>
-            </div>
-
-            <!-- Seção de Destaques -->
+        <main id="main-content" class="p-4">
+            <!-- Conteúdo principal aqui -->
             <section>
                 <h2 class="text-xl font-bold text-gray-800 mb-4">Destaques</h2>
-                
-                <!-- Grid de produtos -->
-                <div class="grid grid-cols-1 gap-6">
-                    
-                    <!-- Produto 1: Tablete Recheado Pistache -->
-                    <div class="flex items-start space-x-4 bg-white rounded-lg overflow-hidden">
-                        <img src="https://static.ifood-static.com.br/image/upload/t_medium/pratos/1fc01f2a-c53e-4186-9b3b-be2c41527dcc/202508032331_C284_i.jpg" alt="Tablete Recheado Pistache" class="w-28 h-28 object-cover rounded-md">
-                        <div class="py-2 pr-2 flex-1">
-                            <h3 class="font-semibold text-gray-800">Tablete Recheado Pistache Emily In Paris 90G</h3>
-                            <p class="text-sm text-gray-500 mt-1">Delicioso tablete de chocolate com recheio cremoso de pistache.</p>
-                            <p class="font-bold text-lg text-green-600 mt-2">R$ 9,90</p>
-                        </div>
-                    </div>
-
-                    <!-- Produto 2: Cesta Lanut -->
-                    <div class="flex items-start space-x-4 bg-white rounded-lg overflow-hidden">
-                        <img src="https://static.ifood-static.com.br/image/upload/t_medium/pratos/2c6f230b-9ea3-4160-a513-64cafdcf096b/202508111422_AQ84_i.jpg" alt="Cesta Lanut" class="w-28 h-28 object-cover rounded-md">
-                        <div class="py-2 pr-2 flex-1">
-                            <h3 class="font-semibold text-gray-800">Cesta Lanut</h3>
-                            <p class="text-sm text-gray-500 mt-1">1 Kit Acessório G, 1 Caixa Minishow Lanut 108g, 1 Tablete 100g Lanut Avelã, 1 Tablete 100g Lanut Avelã Branco, 1 Tablete 30g Bc Imunidade, 1 Chocowafer 80g Lanut, 1 Slack 315g Lanut, 3 Tabletes 20g Lanut Ao Leite, 2 Trufas 30g Lanut, 2 Trufas 30g Grancherie</p>
-                            <p class="font-bold text-lg text-green-600 mt-2">R$ 119,90</p>
-                        </div>
-                    </div>
-
-                    <!-- Produto 3: Carnauba Speculos -->
-                    <div class="flex items-start space-x-4 bg-white rounded-lg overflow-hidden">
-                        <img src="https://static.ifood-static.com.br/image/upload/t_medium/pratos/2c6f230b-9ea3-4160-a513-64cafdcf096b/202508061108_T578_i.jpg" alt="Carnauba Speculos" class="w-28 h-28 object-cover rounded-md">
-                        <div class="py-2 pr-2 flex-1">
-                            <h3 class="font-semibold text-gray-800">Carnauba Speculos</h3>
-                            <p class="text-sm text-gray-500 mt-1">1 Drageado Speculos 100g, 1 Biscoito Ao Leite 85g, 4 Tablete Lacreme Kids 18g, 1 Cx Miau Ao Leite 70g, 4 Trufas Tradicional 30g, Café Filtrado 100g</p>
-                            <p class="font-bold text-lg text-green-600 mt-2">R$ 89,90</p>
-                        </div>
-                    </div>
+                <div id="product-list" class="grid grid-cols-1 gap-6">
+                    <!-- Produtos serão injetados aqui pelo JavaScript -->
                 </div>
             </section>
         </main>
 
-        <!-- Barra de Navegação Inferior -->
+        <!-- Outras páginas aqui -->
+
         <footer class="fixed bottom-0 left-0 right-0 max-w-sm mx-auto bg-white border-t border-gray-200 flex justify-around py-2">
-            <a href="#" class="flex flex-col items-center text-pink-600 w-1/4">
-                <i data-feather="home" class="w-6 h-6"></i>
-                <span class="text-xs font-medium">Início</span>
-            </a>
-            <a href="#" class="flex flex-col items-center text-gray-500 hover:text-pink-600 w-1/4">
-                <i data-feather="search" class="w-6 h-6"></i>
-                <span class="text-xs">Buscar</span>
-            </a>
-            <a href="#" class="flex flex-col items-center text-gray-500 hover:text-pink-600 w-1/4">
-                <i data-feather="shopping-bag" class="w-6 h-6"></i>
-                <span class="text-xs">Pedidos</span>
-            </a>
-            <a href="#" class="flex flex-col items-center text-gray-500 hover:text-pink-600 w-1/4">
-                <i data-feather="user" class="w-6 h-6"></i>
-                <span class="text-xs">Perfil</span>
-            </a>
+            <!-- Ícones de navegação -->
         </footer>
     </div>
 
-    <script>
-        // Inicializa os ícones do Feather Icons
-        feather.replace();
-    </script>
+    <!-- Modal de Produto -->
+    <div id="product-modal" class="modal-overlay">
+        <div id="product-modal-content" class="modal-content">
+            <!-- Conteúdo do modal do produto será injetado aqui -->
+        </div>
+    </div>
+    
+    <!-- Modal de Pagamento PIX -->
+    <div id="pix-modal" class="modal-overlay">
+        <div id="pix-modal-content" class="modal-content text-center">
+            <!-- Conteúdo do PIX será injetado aqui -->
+        </div>
+    </div>
 
+    <!-- Modal de Avaliações -->
+    <div id="reviews-modal" class="modal-overlay">
+        <!-- Conteúdo do modal de avaliações -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            feather.replace();
+
+            // URL do seu servidor no Render
+            const backendUrl = 'https://dona.onrender.com';
+
+            const products = [
+                { id: 1, name: 'Tablete Recheado Pistache Emily In Paris 90G', description: 'Delicioso tablete de chocolate com recheio cremoso de pistache.', price: '9.90', image: 'https://static.ifood-static.com.br/image/upload/t_medium/pratos/1fc01f2a-c5e-4186-9b3b-be2c41527dcc/202508032331_C284_i.jpg' },
+                { id: 2, name: 'Cesta Lanut', description: 'Uma seleção incrível de chocolates Lanut.', price: '119.90', image: 'https://static.ifood-static.com.br/image/upload/t_medium/pratos/2c6f230b-9ea3-4160-a513-64cafdcf096b/202508111422_AQ84_i.jpg' },
+                { id: 3, name: 'Carnauba Speculos', description: 'Uma cesta deliciosa com o melhor da Carnauba.', price: '89.90', image: 'https://static.ifood-static.com.br/image/upload/t_medium/pratos/2c6f230b-9ea3-4160-a513-64cafdcf096b/202508061108_T578_i.jpg' },
+                { id: 4, name: 'Doce Individual', description: 'Um docinho delicioso para alegrar o seu dia.', price: '1.49', image: 'https://placehold.co/150x150/F8D4E4/4A2328?text=Doce' }
+            ];
+
+            const productList = document.getElementById('product-list');
+            const productModal = document.getElementById('product-modal');
+            const productModalContent = document.getElementById('product-modal-content');
+            const pixModal = document.getElementById('pix-modal');
+            const pixModalContent = document.getElementById('pix-modal-content');
+
+            function renderProducts() {
+                productList.innerHTML = '';
+                products.forEach(product => {
+                    const productElement = document.createElement('div');
+                    productElement.className = 'flex items-start space-x-4 bg-white rounded-lg overflow-hidden cursor-pointer product-item';
+                    productElement.dataset.id = product.id;
+                    productElement.innerHTML = `
+                        <img src="${product.image}" alt="${product.name}" class="w-28 h-28 object-cover rounded-md">
+                        <div class="py-2 pr-2 flex-1">
+                            <h3 class="font-semibold text-gray-800">${product.name}</h3>
+                            <p class="text-sm text-gray-500 mt-1 line-clamp-2">${product.description}</p>
+                            <p class="font-bold text-lg text-green-600 mt-2">R$ ${product.price.replace('.', ',')}</p>
+                        </div>
+                    `;
+                    productList.appendChild(productElement);
+                });
+            }
+
+            productList.addEventListener('click', (e) => {
+                const productItem = e.target.closest('.product-item');
+                if (productItem) {
+                    const productId = parseInt(productItem.dataset.id);
+                    const product = products.find(p => p.id === productId);
+                    
+                    productModalContent.innerHTML = `
+                        <div class="relative">
+                            <button id="close-product-modal" class="absolute -top-4 -right-4 bg-white rounded-full p-1 shadow-md"><i data-feather="x" class="w-6 h-6 text-gray-700"></i></button>
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover rounded-lg mb-4">
+                            <h2 class="text-2xl font-bold mb-2">${product.name}</h2>
+                            <p class="text-gray-600 mb-4">${product.description}</p>
+                            <span class="text-2xl font-bold text-green-700">R$ ${product.price.replace('.', ',')}</span>
+                            <button id="pay-btn" class="w-full bg-pink-600 text-white font-bold py-3 rounded-lg hover:bg-pink-700 transition-colors mt-4">
+                                Pagar com PIX
+                            </button>
+                        </div>
+                    `;
+                    feather.replace();
+                    productModal.classList.add('active');
+
+                    document.getElementById('close-product-modal').addEventListener('click', () => productModal.classList.remove('active'));
+                    
+                    document.getElementById('pay-btn').addEventListener('click', () => {
+                        generatePix(product);
+                    });
+                }
+            });
+
+            async function generatePix(product) {
+                productModal.classList.remove('active');
+                pixModalContent.innerHTML = `<div class="loader mx-auto"></div><p class="mt-4">A gerar PIX, aguarde...</p>`;
+                pixModal.classList.add('active');
+
+                try {
+                    const response = await fetch(`${backendUrl}/criar-pagamento`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            valor: product.price,
+                            info: product.name
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Falha ao gerar o PIX');
+                    }
+
+                    const data = await response.json();
+                    
+                    pixModalContent.innerHTML = `
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-bold">Pague com PIX</h2>
+                            <button id="close-pix-modal" class="text-gray-500 hover:text-gray-800"><i data-feather="x" class="w-6 h-6"></i></button>
+                        </div>
+                        <p>Leia o QR Code com a app do seu banco:</p>
+                        <img src="data:image/png;base64,${data.qrCodeBase64}" alt="PIX QR Code" class="mx-auto my-4 border rounded-lg">
+                        <p class="font-semibold">Ou copie o código abaixo:</p>
+                        <textarea readonly class="w-full p-2 mt-2 text-sm bg-gray-100 border rounded-md resize-none">${data.copiaECola}</textarea>
+                        <button id="copy-pix-btn" class="w-full bg-gray-200 font-bold py-2 rounded-lg mt-2">Copiar Código</button>
+                    `;
+                    feather.replace();
+                    
+                    document.getElementById('close-pix-modal').addEventListener('click', () => pixModal.classList.remove('active'));
+                    document.getElementById('copy-pix-btn').addEventListener('click', (e) => {
+                        const textarea = pixModalContent.querySelector('textarea');
+                        textarea.select();
+                        document.execCommand('copy');
+                        e.target.innerText = 'Copiado!';
+                    });
+
+                } catch (error) {
+                    pixModalContent.innerHTML = `<p class="text-red-500 font-semibold">Ocorreu um Erro</p><p class="text-gray-600 mt-2">${error.message}</p><button id="close-pix-modal" class="mt-4 bg-gray-200 px-4 py-2 rounded-lg">Fechar</button>`;
+                    document.getElementById('close-pix-modal').addEventListener('click', () => pixModal.classList.remove('active'));
+                }
+            }
+
+            renderProducts();
+        });
+    </script>
 </body>
 </html>
