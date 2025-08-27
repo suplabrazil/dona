@@ -19,7 +19,7 @@ mercadopago.configure({
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- CONFIGURAÇÕES DO SERVIDOR ---
-app.use(cors()); // Mesmo com tudo no mesmo domínio, é bom manter para flexibilidade
+app.use(cors());
 app.use(express.json());
 
 // Rota para criar o pagamento PIX (A NOSSA API)
@@ -37,7 +37,10 @@ app.post('/criar-pagamento', async (req, res) => {
       description: info,
       payment_method_id: 'pix',
       payer: {
-        email: 'test_user_123456@testuser.com',
+        // --- CORREÇÃO APLICADA AQUI ---
+        // O e-mail do pagador (payer) não pode ser o mesmo e-mail do vendedor (a sua conta MP).
+        // Alterado para um e-mail genérico para evitar o erro "Invalid users involved".
+        email: 'comprador.dona.elma@email.com', 
         first_name: 'Cliente',
         last_name: 'Dona Elma'
       }
