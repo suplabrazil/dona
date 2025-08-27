@@ -23,7 +23,6 @@
 <body class="bg-gray-50">
 
     <div id="app-container" class="max-w-sm mx-auto bg-white min-h-screen shadow-lg relative">
-        <!-- Cabeçalho e conteúdo principal -->
         <header>
             <div class="h-32 bg-cover bg-center" style="background-image: url('https://iili.io/KJsfN6v.png')"></div>
             <div class="p-4 bg-white">
@@ -31,6 +30,14 @@
                     <img src="https://iili.io/KJsFwDg.png" alt="Logo Dona Elma" class="w-24 h-24 rounded-full -mt-12 shadow-md">
                     <div class="flex-1 pt-2">
                         <h1 class="text-2xl font-bold text-gray-800">Dona Elma</h1>
+                        <div class="flex items-center space-x-2">
+                            <p class="text-sm text-pink-600 font-semibold cursor-pointer" id="ver-mais-btn">Ver mais</p>
+                            <div class="flex items-center text-sm text-gray-600 cursor-pointer" id="reviews-btn">
+                                <i data-feather="star" class="w-4 h-4 text-yellow-500 fill-current"></i>
+                                <span class="font-bold ml-1">4.8</span>
+                                <span class="text-gray-500 ml-1">(264)</span>
+                            </div>
+                        </div>
                         <p class="text-xs text-gray-500 mt-1">Pedido mínimo R$ 15,00</p>
                     </div>
                 </div>
@@ -55,6 +62,21 @@
         <div id="pix-modal-content" class="modal-content text-center"></div>
     </div>
 
+    <!-- Modal de Avaliações -->
+    <div id="reviews-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Avaliações (264)</h2>
+                <button id="close-reviews-modal" class="text-gray-500 hover:text-gray-800">
+                    <i data-feather="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div id="reviews-list" class="space-y-4 max-h-96 overflow-y-auto">
+                <!-- Lista de avaliações será injetada aqui -->
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             feather.replace();
@@ -63,8 +85,10 @@
             let pollingInterval; // Variável para controlar a verificação
 
             const products = [
-                { id: 1, name: 'Tablete Recheado Pistache', price: '9.90', image: 'https://static.ifood-static.com.br/image/upload/t_medium/pratos/1fc01f2a-c53e-4186-9b3b-be2c41527dcc/202508032331_C284_i.jpg' },
-                { id: 4, name: 'Doce Individual', price: '1.49', image: 'https://placehold.co/150x150/F8D4E4/4A2328?text=Doce' }
+                { id: 1, name: 'Tablete Recheado Pistache Emily In Paris 90G', description: 'Delicioso tablete de chocolate com recheio cremoso de pistache.', price: '9.90', image: 'https://static.ifood-static.com.br/image/upload/t_medium/pratos/1fc01f2a-c53e-4186-9b3b-be2c41527dcc/202508032331_C284_i.jpg' },
+                { id: 2, name: 'Cesta Lanut', description: '1 Kit Acessório G, 1 Caixa Minishow Lanut 108g, 1 Tablete 100g Lanut Avelã, 1 Tablete 100g Lanut Avelã Branco, 1 Tablete 30g Bc Imunidade, 1 Chocowafer 80g Lanut, 1 Slack 315g Lanut, 3 Tabletes 20g Lanut Ao Leite, 2 Trufas 30g Lanut, 2 Trufas 30g Grancherie', price: '119.90', image: 'https://static.ifood-static.com.br/image/upload/t_medium/pratos/2c6f230b-9ea3-4160-a513-64cafdcf096b/202508111422_AQ84_i.jpg' },
+                { id: 3, name: 'Carnauba Speculos', description: '1 Drageado Speculos 100g, 1 Biscoito Ao Leite 85g, 4 Tablete Lacreme Kids 18g, 1 Cx Miau Ao Leite 70g, 4 Trufas Tradicional 30g, Café Filtrado 100g', price: '89.90', image: 'https://static.ifood-static.com.br/image/upload/t_medium/pratos/2c6f230b-9ea3-4160-a513-64cafdcf096b/202508061108_T578_i.jpg' },
+                { id: 4, name: 'Doce Individual', description: 'Um docinho delicioso para alegrar o seu dia.', price: '1.49', image: 'https://placehold.co/150x150/F8D4E4/4A2328?text=Doce' }
             ];
             
             const productList = document.getElementById('product-list');
@@ -72,6 +96,10 @@
             const productModalContent = document.getElementById('product-modal-content');
             const pixModal = document.getElementById('pix-modal');
             const pixModalContent = document.getElementById('pix-modal-content');
+            const reviewsModal = document.getElementById('reviews-modal');
+            const reviewsBtn = document.getElementById('reviews-btn');
+            const closeReviewsModalBtn = document.getElementById('close-reviews-modal');
+            const reviewsList = document.getElementById('reviews-list');
 
             function renderProducts() {
                 productList.innerHTML = '';
@@ -79,7 +107,7 @@
                     const productElement = document.createElement('div');
                     productElement.className = 'flex items-start space-x-4 bg-white rounded-lg overflow-hidden cursor-pointer product-item';
                     productElement.dataset.id = product.id;
-                    productElement.innerHTML = `<img src="${product.image}" alt="${product.name}" class="w-28 h-28 object-cover rounded-md"><div class="py-2 pr-2 flex-1"><h3 class="font-semibold text-gray-800">${product.name}</h3><p class="font-bold text-lg text-green-600 mt-2">R$ ${product.price.replace('.', ',')}</p></div>`;
+                    productElement.innerHTML = `<img src="${product.image}" alt="${product.name}" class="w-28 h-28 object-cover rounded-md"><div class="py-2 pr-2 flex-1"><h3 class="font-semibold text-gray-800">${product.name}</h3><p class="text-sm text-gray-500 mt-1 line-clamp-2">${product.description}</p><p class="font-bold text-lg text-green-600 mt-2">R$ ${product.price.replace('.', ',')}</p></div>`;
                     productList.appendChild(productElement);
                 });
             }
@@ -88,7 +116,7 @@
                 const productItem = e.target.closest('.product-item');
                 if (productItem) {
                     const product = products.find(p => p.id === parseInt(productItem.dataset.id));
-                    productModalContent.innerHTML = `<div class="relative"><button id="close-product-modal" class="absolute -top-4 -right-4 bg-white rounded-full p-1 shadow-md"><i data-feather="x" class="w-6 h-6 text-gray-700"></i></button><img src="${product.image}" class="w-full h-48 object-cover rounded-lg mb-4"><h2 class="text-2xl font-bold mb-2">${product.name}</h2><span class="text-2xl font-bold text-green-700">R$ ${product.price.replace('.', ',')}</span><button id="pay-btn" class="w-full bg-pink-600 text-white font-bold py-3 rounded-lg mt-4">Pagar com PIX</button></div>`;
+                    productModalContent.innerHTML = `<div class="relative"><button id="close-product-modal" class="absolute -top-4 -right-4 bg-white rounded-full p-1 shadow-md"><i data-feather="x" class="w-6 h-6 text-gray-700"></i></button><img src="${product.image}" class="w-full h-48 object-cover rounded-lg mb-4"><h2 class="text-2xl font-bold mb-2">${product.name}</h2><p class="text-gray-600 mb-4">${product.description}</p><span class="text-2xl font-bold text-green-700">R$ ${product.price.replace('.', ',')}</span><button id="pay-btn" class="w-full bg-pink-600 text-white font-bold py-3 rounded-lg mt-4">Pagar com PIX</button></div>`;
                     feather.replace();
                     productModal.classList.add('active');
                     document.getElementById('close-product-modal').addEventListener('click', () => productModal.classList.remove('active'));
@@ -113,11 +141,10 @@
                     pixModalContent.innerHTML = `<div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">Pague com PIX</h2><button id="close-pix-modal" class="text-gray-500"><i data-feather="x" class="w-6 h-6"></i></button></div><img src="data:image/png;base64,${data.qrCodeBase64}" class="mx-auto my-4 border"><p class="font-semibold">Ou copie o código abaixo:</p><textarea readonly class="w-full p-2 mt-2 bg-gray-100 border">${data.copiaECola}</textarea><p id="status-text" class="mt-4 font-semibold">A aguardar pagamento...</p>`;
                     feather.replace();
                     document.getElementById('close-pix-modal').addEventListener('click', () => {
-                        clearInterval(pollingInterval); // Para a verificação ao fechar
+                        clearInterval(pollingInterval);
                         pixModal.classList.remove('active');
                     });
                     
-                    // Inicia a verificação do status do pagamento
                     startPolling(data.paymentId);
 
                 } catch (error) {
@@ -133,13 +160,13 @@
                         const data = await response.json();
 
                         if (data.status === 'approved') {
-                            clearInterval(pollingInterval); // Para a verificação
+                            clearInterval(pollingInterval);
                             showSuccessMessage();
                         }
                     } catch (error) {
                         console.error('Erro ao verificar status:', error);
                     }
-                }, 5000); // Verifica a cada 5 segundos
+                }, 5000);
             }
 
             function showSuccessMessage() {
@@ -156,6 +183,34 @@
                 document.getElementById('close-success-modal').addEventListener('click', () => {
                     pixModal.classList.remove('active');
                 });
+            }
+
+            // Lógica para o modal de avaliações
+            reviewsBtn.addEventListener('click', () => {
+                generateReviews();
+                reviewsModal.classList.add('active');
+            });
+            closeReviewsModalBtn.addEventListener('click', () => {
+                reviewsModal.classList.remove('active');
+            });
+            reviewsModal.addEventListener('click', (e) => {
+                if (e.target === reviewsModal) {
+                    reviewsModal.classList.remove('active');
+                }
+            });
+
+            function generateReviews() {
+                reviewsList.innerHTML = '';
+                const names = ['Ana', 'Bruno', 'Carla', 'Daniel', 'Eduarda', 'Felipe', 'Gabriela', 'Heitor', 'Isabela', 'João'];
+                for (let i = 0; i < 264; i++) {
+                    const name = names[i % names.length];
+                    const rating = (Math.random() * (5 - 4) + 4).toFixed(1);
+                    const reviewElement = document.createElement('div');
+                    reviewElement.className = 'flex items-center justify-between';
+                    reviewElement.innerHTML = `<p class="font-semibold">${name} ${i+1}</p><div class="flex items-center"><span class="font-bold mr-1">${rating}</span><i data-feather="star" class="w-4 h-4 text-yellow-500 fill-current"></i></div>`;
+                    reviewsList.appendChild(reviewElement);
+                }
+                feather.replace();
             }
 
             renderProducts();
