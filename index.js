@@ -2,30 +2,33 @@
 const express = require('express');
 const cors = require('cors');
 const mercadopago = require('mercadopago');
-const path = require('path');
+const path = require('path'); // Módulo para lidar com caminhos de ficheiros
 
 // Cria uma instância da aplicação
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configura o SDK do Mercado Pago
+// --- CONFIGURAÇÃO IMPORTANTE ---
+// Configura o SDK do Mercado Pago com a sua chave secreta (Access Token)
 mercadopago.configure({
   access_token: process.env.MP_ACCESS_TOKEN
 });
 
-// Serve os ficheiros do site (Front-end)
+// --- SERVIR FICHEIROS DO SITE (FRONT-END) ---
+// Diz ao Express para usar a pasta 'public' para servir ficheiros estáticos (HTML, CSS, JS do site)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configurações do Servidor
+// --- CONFIGURAÇÕES DO SERVIDOR ---
 app.use(cors());
 app.use(express.json());
 
-// Rota para criar o pagamento PIX
+// Rota para criar o pagamento PIX (A NOSSA API)
 app.post('/criar-pagamento', async (req, res) => {
   try {
     const { valor, info } = req.body;
 
     if (!process.env.MP_ACCESS_TOKEN) {
+        console.error('ACCESS TOKEN do Mercado Pago não está configurado no Render.');
         return res.status(500).json({ error: 'Erro de configuração do servidor.' });
     }
 
@@ -34,7 +37,7 @@ app.post('/criar-pagamento', async (req, res) => {
       description: info,
       payment_method_id: 'pix',
       payer: {
-        email: 'comprador.dona.elma@email.com',
+        email: 'comprador.dona.elma@email.com', 
         first_name: 'Cliente',
         last_name: 'Dona Elma'
       }
@@ -42,11 +45,13 @@ app.post('/criar-pagamento', async (req, res) => {
 
     const data = await mercadopago.payment.create(payment_data);
 
-    // Envia de volta os dados do PIX E o ID do pagamento
+    const qrCodeBase64 = data.body.point_of_interaction.transaction_data.qr_code_base64;
+    const copiaECola = data.body.point_of_interaction.transaction_data.qr_code;
+
     res.json({
-      paymentId: data.body.id, // ID do pagamento, crucial para verificação
-      qrCodeBase64: data.body.point_of_interaction.transaction_data.qr_code_base64,
-      copiaECola: data.body.point_of_interaction.transaction_data.qr_code
+      paymentId: data.body.id,
+      qrCodeBase64,
+      copiaECola
     });
 
   } catch (error) {
@@ -55,13 +60,12 @@ app.post('/criar-pagamento', async (req, res) => {
   }
 });
 
-// --- NOVA ROTA PARA VERIFICAR O PAGAMENTO ---
+// Rota para verificar o pagamento
 app.get('/verificar-pagamento/:id', async (req, res) => {
   try {
     const paymentId = req.params.id;
     const { body } = await mercadopago.payment.get(paymentId);
     
-    // Envia o status do pagamento de volta para o site
     res.json({ status: body.status });
 
   } catch (error) {
@@ -70,11 +74,11 @@ app.get('/verificar-pagamento/:id', async (req, res) => {
   }
 });
 
-
-// Rota principal que serve o seu site
+// Rota principal que agora serve o seu site
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
 
 // Inicia o servidor
 app.listen(PORT, () => {
