@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const mercadopago = require('mercadopago');
+const path = require('path'); // Módulo para lidar com caminhos de ficheiros
 
 // Cria uma instância da aplicação
 const app = express();
@@ -13,39 +14,19 @@ mercadopago.configure({
   access_token: process.env.MP_ACCESS_TOKEN
 });
 
-// --- CORREÇÃO DO CORS ---
-// Lista de domínios permitidos a aceder a este servidor
-const dominiosPermitidos = [
-  'https://donaelma.com', 
-  'http://127.0.0.1:5500' // Adicionado para testes locais, se necessário
-];
+// --- SERVIR FICHEIROS DO SITE (FRONT-END) ---
+// Diz ao Express para usar a pasta 'public' para servir ficheiros estáticos (HTML, CSS, JS do site)
+app.use(express.static(path.join(__dirname, 'public')));
 
-const opcoesCors = {
-  origin: function (origin, callback) {
-    // Permite pedidos sem 'origin' (como apps mobile ou Postman) ou se o domínio estiver na lista
-    if (!origin || dominiosPermitidos.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Não permitido pelo CORS'));
-    }
-  }
-};
-
-// Habilita o CORS com as opções específicas
-app.use(cors(opcoesCors));
+// --- CONFIGURAÇÕES DO SERVIDOR ---
+app.use(cors()); // Mesmo com tudo no mesmo domínio, é bom manter para flexibilidade
 app.use(express.json());
 
-// Rota principal para testar
-app.get('/', (req, res) => {
-  res.send('Servidor da Dona Elma com Mercado Pago está no ar!');
-});
-
-// Rota para criar o pagamento PIX
+// Rota para criar o pagamento PIX (A NOSSA API)
 app.post('/criar-pagamento', async (req, res) => {
   try {
     const { valor, info } = req.body;
 
-    // Validação básica para garantir que o token está configurado
     if (!process.env.MP_ACCESS_TOKEN) {
         console.error('ACCESS TOKEN do Mercado Pago não está configurado no Render.');
         return res.status(500).json({ error: 'Erro de configuração do servidor.' });
@@ -56,25 +37,13 @@ app.post('/criar-pagamento', async (req, res) => {
       description: info,
       payment_method_id: 'pix',
       payer: {
-        email: 'test_user_123456@testuser.com', // E-mail de teste VÁLIDO exigido pelo MP
+        email: 'test_user_123456@testuser.com',
         first_name: 'Cliente',
-        last_name: 'Dona Elma',
-        address: {
-          zip_code: '01001000',
-          street_name: 'Rua Exemplo',
-          street_number: '123',
-          neighborhood: 'Centro',
-          city: 'São Paulo',
-          federal_unit: 'SP'
-        }
+        last_name: 'Dona Elma'
       }
     };
 
-    console.log("A enviar os seguintes dados para o Mercado Pago:", JSON.stringify(payment_data, null, 2));
-
     const data = await mercadopago.payment.create(payment_data);
-    
-    console.log("Resposta recebida do Mercado Pago com sucesso.");
 
     const qrCodeBase64 = data.body.point_of_interaction.transaction_data.qr_code_base64;
     const copiaECola = data.body.point_of_interaction.transaction_data.qr_code;
@@ -85,20 +54,16 @@ app.post('/criar-pagamento', async (req, res) => {
     });
 
   } catch (error) {
-    // Log detalhado do erro no console do servidor (Render)
-    console.error('--- ERRO DETALHADO AO CRIAR PAGAMENTO PIX ---');
-    if (error.response) {
-      console.error('Status:', error.response.status);
-      console.error('Data:', JSON.stringify(error.response.data, null, 2));
-    } else {
-      console.error('Mensagem de erro:', error.message);
-    }
-    console.error('---------------------------------------------');
-
-    // Envia uma mensagem de erro mais detalhada para o front-end
-    res.status(500).json({ error: 'Falha ao comunicar com o gateway de pagamento. Verifique os logs do servidor.' });
+    console.error('Erro ao criar pagamento PIX:', error.message);
+    res.status(500).json({ error: 'Falha ao gerar o PIX.' });
   }
 });
+
+// Rota principal que agora serve o seu site
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 
 // Inicia o servidor
 app.listen(PORT, () => {
