@@ -11,13 +11,14 @@
 
     <style>
         body { font-family: 'Inter', sans-serif; }
-        main { padding-bottom: 80px; }
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 50; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        main { padding-bottom: 100px; } /* Espaço para o botão do carrinho */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 50; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
-        .modal-content { background: white; padding: 1.5rem; border-radius: 0.5rem; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.3s ease; }
+        .modal-content { background: white; padding: 1.5rem; border-radius: 0.75rem; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.3s ease; }
         .modal-overlay.active .modal-content { transform: scale(1); }
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid #c0392b; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -30,6 +31,7 @@
                     <img src="https://iili.io/KKDRcjS.png" alt="Logo Dona Elma" class="w-24 h-24 rounded-full -mt-16 border-4 border-white shadow-md">
                     <div class="flex-1 pt-2">
                         <h1 class="text-3xl font-bold text-gray-800">Dona Elma Pizzaria</h1>
+                        <p class="text-sm text-gray-600 font-semibold">IPATINGA-MG</p>
                          <div class="flex items-center text-sm text-gray-600 mt-1">
                             <i data-feather="star" class="w-4 h-4 text-yellow-500 fill-current"></i>
                             <span class="font-bold ml-1">4.9</span>
@@ -44,15 +46,29 @@
         <main id="main-content" class="p-4">
             <section>
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Mais Vendidos</h2>
-                <div id="product-list" class="grid grid-cols-2 gap-4">
-                    <!-- Produtos serão inseridos aqui -->
-                </div>
+                <div id="product-list" class="grid grid-cols-2 gap-4"></div>
+            </section>
+            <section class="mt-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Bebidas</h2>
+                <div id="drinks-list" class="grid grid-cols-2 gap-4"></div>
             </section>
         </main>
     </div>
 
+    <!-- Botão Flutuante do Carrinho -->
+    <div id="cart-button" class="fixed bottom-4 right-4 z-40 cursor-pointer hidden">
+        <div class="relative">
+            <div class="bg-red-600 text-white rounded-full p-4 shadow-lg">
+                <i data-feather="shopping-cart" class="w-8 h-8"></i>
+            </div>
+            <span id="cart-item-count" class="absolute -top-1 -right-1 bg-yellow-400 text-gray-900 text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">0</span>
+        </div>
+    </div>
+
     <!-- Modais -->
     <div id="product-modal" class="modal-overlay"><div id="product-modal-content" class="modal-content"></div></div>
+    <div id="cart-modal" class="modal-overlay"><div id="cart-modal-content" class="modal-content"></div></div>
+    <div id="customer-info-modal" class="modal-overlay"><div id="customer-info-content" class="modal-content"></div></div>
     <div id="payment-selection-modal" class="modal-overlay"><div id="payment-selection-content" class="modal-content"></div></div>
     <div id="pix-modal" class="modal-overlay"><div id="pix-modal-content" class="modal-content text-center"></div></div>
 
@@ -62,27 +78,38 @@
 
             const backendUrl = '';
             let pollingInterval;
+            let cart = [];
 
             const products = [
-                { id: 1, name: 'Nutella Premium', description: 'Creme de Avelã Nutella, polvilhado com leite Ninho e pedaços de morango.', price: '44.99', image: 'https://iili.io/KKDZMS2.png', best_seller: true },
-                { id: 2, name: '1/2 Mussarela 1/2 Calabresa - Grande', description: '1/2 Calabresa 1/2 Mussarela a favorita de todos, combinação perfeita da tradição! O sabor mais vendido em Minas Gerais.', price: '39.99', image: 'https://iili.io/KKDM5Is.png' },
-                { id: 3, name: 'Banana Caramelizada', description: 'A mais Vendida, a deliciosa, a insuperável, a fantástica pizza doce de Banana Caramelizada. Prove e se surpreenda!!!!', price: '40.99', image: 'https://iili.io/KKDhrSp.png' },
-                { id: 4, name: 'Calabresa - Grande (8 pedaços)', description: 'Calabresa, cebola, molho de tomate natural, azeitona preta e orégano.', price: '39.99', image: 'https://iili.io/KKDOIbS.png' },
-                { id: 5, name: '1/2 Portuguesa 1/2 Calabresa - Grande', description: '1/2 Portuguesa 1/2 Calabresa uma escolha popular que nunca sai de moda, perfeita para qualquer ocasião!', price: '41.99', image: 'https://iili.io/KKD4Qvn.png' },
-                { id: 6, name: '1/2 Frango C/ Catupiry 1/2 Calabresa - Grande', description: '1/2 Calabresa 1/2 Frango Catupiry dois clássicos em perfeita harmonia para agradar todos os paladares!', price: '42.99', image: 'https://iili.io/KKb9VqX.png' },
+                { id: 1, name: 'Nutella Premium', description: 'Creme de Avelã Nutella, polvilhado com leite Ninho e pedaços de morango.', price: '44.99', image: 'https://iili.io/KKDZMS2.png', best_seller: true, type: 'pizza' },
+                { id: 2, name: '1/2 Mussarela 1/2 Calabresa - Grande (8 pedaços)', description: '1/2 Calabresa 1/2 Mussarela a favorita de todos, combinação perfeita da tradição! O sabor mais vendido em Minas Gerais.', price: '39.99', image: 'https://iili.io/KKDM5Is.png', type: 'pizza' },
+                { id: 3, name: 'Banana Caramelizada', description: 'A mais Vendida, a deliciosa, a insuperável, a fantástica pizza doce de Banana Caramelizada. Prove e se surpreenda!!!!', price: '40.99', image: 'https://iili.io/KKDhrSp.png', type: 'pizza' },
+                { id: 4, name: 'Calabresa - Grande (8 pedaços)', description: 'Calabresa, cebola, molho de tomate natural, azeitona preta e orégano.', price: '39.99', image: 'https://iili.io/KKDOIbS.png', type: 'pizza' },
+                { id: 5, name: '1/2 Portuguesa 1/2 Calabresa - Grande (8 pedaços)', description: '1/2 Portuguesa 1/2 Calabresa uma escolha popular que nunca sai de moda, perfeita para qualquer ocasião!', price: '41.99', image: 'https://iili.io/KKD4Qvn.png', type: 'pizza' },
+                { id: 6, name: '1/2 Frango C/ Catupiry 1/2 Calabresa - Grande (8 pedaços)', description: '1/2 Calabresa 1/2 Frango Catupiry dois clássicos em perfeita harmonia para agradar todos os paladares!', price: '42.99', image: 'https://iili.io/KKb9VqX.png', type: 'pizza' },
+            ];
+
+            const drinks = [
+                { id: 7, name: 'Coca-Cola 2L', price: '8.00', image: 'https://placehold.co/400x400/E62A29/FFFFFF?text=Coca-Cola', type: 'drink' },
+                { id: 8, name: 'Fanta Laranja 2L', price: '7.00', image: 'https://placehold.co/400x400/F47920/FFFFFF?text=Fanta', type: 'drink' },
             ];
             
+            // Elementos da DOM
             const productList = document.getElementById('product-list');
-            const productModal = document.getElementById('product-modal');
-            const productModalContent = document.getElementById('product-modal-content');
-            const paymentSelectionModal = document.getElementById('payment-selection-modal');
-            const paymentSelectionContent = document.getElementById('payment-selection-content');
-            const pixModal = document.getElementById('pix-modal');
-            const pixModalContent = document.getElementById('pix-modal-content');
+            const drinksList = document.getElementById('drinks-list');
+            const cartButton = document.getElementById('cart-button');
+            const cartItemCount = document.getElementById('cart-item-count');
 
-            function renderProducts() {
-                productList.innerHTML = '';
-                products.forEach(product => {
+            // Modais
+            const productModal = document.getElementById('product-modal');
+            const cartModal = document.getElementById('cart-modal');
+            const customerInfoModal = document.getElementById('customer-info-modal');
+            const paymentSelectionModal = document.getElementById('payment-selection-modal');
+            const pixModal = document.getElementById('pix-modal');
+
+            function renderProducts(listElement, items) {
+                listElement.innerHTML = '';
+                items.forEach(product => {
                     const productElement = document.createElement('div');
                     productElement.className = 'bg-white rounded-lg overflow-hidden shadow-sm cursor-pointer product-item flex flex-col';
                     productElement.dataset.id = product.id;
@@ -99,49 +126,192 @@
                             ${bestSellerSeal}
                         </div>
                         <div class="p-3 flex flex-col flex-grow">
-                            <h3 class="font-bold text-gray-800 text-base mb-1 flex-grow">${product.name}</h3>
-                            <p class="text-xs text-gray-500 mb-2">${product.description}</p>
-                            <p class="font-bold text-lg text-green-600 mt-auto">R$ ${product.price.replace('.', ',')}</p>
+                            <h3 class="font-bold text-gray-800 text-base mb-1">${product.name}</h3>
+                            <p class="text-xs text-gray-500 mb-2 line-clamp-2 flex-grow">${product.description || ''}</p>
+                            <p class="font-bold text-lg text-green-600 mt-2">R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}</p>
                         </div>
                     `;
-                    productList.appendChild(productElement);
+                    listElement.appendChild(productElement);
                 });
             }
 
-            productList.addEventListener('click', (e) => {
-                const productItem = e.target.closest('.product-item');
-                if (productItem) {
-                    const product = products.find(p => p.id === parseInt(productItem.dataset.id));
-                    productModalContent.innerHTML = `<div class="relative"><button id="close-product-modal" class="absolute -top-4 -right-4 bg-white rounded-full p-1 shadow-md"><i data-feather="x" class="w-6 h-6 text-gray-700"></i></button><img src="${product.image}" class="w-full h-48 object-cover rounded-lg mb-4"><h2 class="text-2xl font-bold mb-2">${product.name}</h2><p class="text-gray-600 mb-4">${product.description}</p><span class="text-2xl font-bold text-green-700">R$ ${product.price.replace('.', ',')}</span><button id="pay-btn" class="w-full bg-red-600 text-white font-bold py-3 rounded-lg mt-4 hover:bg-red-700">Pagar</button></div>`;
-                    feather.replace();
-                    productModal.classList.add('active');
-                    document.getElementById('close-product-modal').addEventListener('click', () => productModal.classList.remove('active'));
-                    document.getElementById('pay-btn').addEventListener('click', () => showPaymentSelection(product));
-                }
-            });
+            function openProductModal(product) {
+                const productModalContent = document.getElementById('product-modal-content');
+                const extrasHtml = product.type === 'pizza' ? `
+                    <div class="mt-4">
+                        <h3 class="font-semibold mb-2">Adicionais (R$ 5,00 cada):</h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center"><input type="checkbox" name="extra" value="Cheddar" class="mr-2">Borda de Cheddar</label>
+                            <label class="flex items-center"><input type="checkbox" name="extra" value="Catupiry" class="mr-2">Borda de Catupiry</label>
+                        </div>
+                    </div>
+                ` : '';
+
+                productModalContent.innerHTML = `
+                    <div class="relative">
+                        <button id="close-product-modal" class="absolute -top-4 -right-4 bg-white rounded-full p-1 shadow-md"><i data-feather="x" class="w-6 h-6 text-gray-700"></i></button>
+                        <img src="${product.image}" class="w-full h-48 object-cover rounded-lg mb-4">
+                        <h2 class="text-2xl font-bold mb-2">${product.name}</h2>
+                        <p class="text-gray-600 mb-4">${product.description || ''}</p>
+                        ${extrasHtml}
+                        <div class="flex justify-between items-center mt-4">
+                             <span class="text-2xl font-bold text-green-700">R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}</span>
+                             <button id="add-to-cart-btn" class="bg-red-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>`;
+                feather.replace();
+                productModal.classList.add('active');
+                document.getElementById('close-product-modal').addEventListener('click', () => productModal.classList.remove('active'));
+                document.getElementById('add-to-cart-btn').addEventListener('click', () => {
+                    const selectedExtras = Array.from(document.querySelectorAll('input[name="extra"]:checked'))
+                                              .map(cb => ({ name: cb.value, price: 5.00 }));
+                    addToCart(product, selectedExtras);
+                    productModal.classList.remove('active');
+                });
+            }
             
-            // A lógica de seleção de pagamento, geração de PIX e verificação continua a mesma das versões anteriores
-            function showPaymentSelection(product) {
-                productModal.classList.remove('active');
+            function addToCart(product, extras = []) {
+                const cartItem = {
+                    ...product,
+                    extras,
+                    cartId: Date.now() 
+                };
+                cart.push(cartItem);
+                updateCart();
+            }
+
+            function removeFromCart(cartId) {
+                cart = cart.filter(item => item.cartId !== cartId);
+                updateCart();
+                openCartModal(); // Re-render cart modal after removing item
+            }
+
+            function updateCart() {
+                if (cart.length > 0) {
+                    cartButton.classList.remove('hidden');
+                    cartItemCount.textContent = cart.length;
+                } else {
+                    cartButton.classList.add('hidden');
+                }
+            }
+
+            function openCartModal() {
+                const cartModalContent = document.getElementById('cart-modal-content');
+                if (cart.length === 0) {
+                    cartModalContent.innerHTML = `<h2 class="text-2xl font-bold text-center">Seu carrinho está vazio.</h2><button id="close-cart-modal" class="absolute -top-4 -right-4 bg-white rounded-full p-1 shadow-md"><i data-feather="x" class="w-6 h-6 text-gray-700"></i></button>`;
+                    feather.replace();
+                    document.getElementById('close-cart-modal').addEventListener('click', () => cartModal.classList.remove('active'));
+                    cartModal.classList.add('active');
+                    return;
+                }
+
+                let itemsHtml = '';
+                let total = 0;
+                cart.forEach(item => {
+                    let itemTotal = parseFloat(item.price);
+                    let extrasHtml = '';
+                    if (item.extras && item.extras.length > 0) {
+                        extrasHtml += '<ul class="text-xs text-gray-500 pl-4">';
+                        item.extras.forEach(extra => {
+                            itemTotal += extra.price;
+                            extrasHtml += `<li>+ ${extra.name}</li>`;
+                        });
+                        extrasHtml += '</ul>';
+                    }
+                    total += itemTotal;
+                    itemsHtml += `
+                        <div class="flex justify-between items-center border-b py-2">
+                            <div>
+                                <p class="font-semibold">${item.name}</p>
+                                ${extrasHtml}
+                            </div>
+                            <div class="flex items-center">
+                                <span class="font-bold mr-4">R$ ${itemTotal.toFixed(2).replace('.', ',')}</span>
+                                <button class="remove-from-cart-btn text-red-500" data-cart-id="${item.cartId}"><i data-feather="trash-2" class="w-5 h-5"></i></button>
+                            </div>
+                        </div>`;
+                });
+
+                cartModalContent.innerHTML = `
+                    <div class="relative">
+                         <button id="close-cart-modal" class="absolute -top-4 -right-4 bg-white rounded-full p-1 shadow-md"><i data-feather="x" class="w-6 h-6 text-gray-700"></i></button>
+                         <h2 class="text-2xl font-bold text-center mb-4">Seu Pedido</h2>
+                         <div class="max-h-64 overflow-y-auto mb-4">${itemsHtml}</div>
+                         <div class="flex justify-between font-bold text-xl border-t pt-4">
+                             <span>Total:</span>
+                             <span>R$ ${total.toFixed(2).replace('.', ',')}</span>
+                         </div>
+                         <button id="checkout-btn" class="w-full bg-red-600 text-white font-bold py-3 rounded-lg mt-6">Finalizar Pedido</button>
+                    </div>`;
+                feather.replace();
+                cartModal.classList.add('active');
+
+                document.getElementById('close-cart-modal').addEventListener('click', () => cartModal.classList.remove('active'));
+                document.getElementById('checkout-btn').addEventListener('click', openCustomerInfoModal);
+                document.querySelectorAll('.remove-from-cart-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const cartId = parseInt(e.currentTarget.dataset.cartId);
+                        removeFromCart(cartId);
+                    });
+                });
+            }
+            
+            function openCustomerInfoModal() {
+                cartModal.classList.remove('active');
+                const customerInfoContent = document.getElementById('customer-info-content');
+                customerInfoContent.innerHTML = `
+                    <h2 class="text-2xl font-bold mb-4">Informações de Entrega</h2>
+                    <input type="text" id="customer-name" placeholder="Seu nome completo" class="w-full p-2 border rounded mb-3" required>
+                    <input type="text" id="customer-address" placeholder="Seu endereço com número" class="w-full p-2 border rounded mb-4" required>
+                    <button id="proceed-to-payment-btn" class="w-full bg-red-600 text-white font-bold py-3 rounded-lg">Ir para Pagamento</button>
+                `;
+                customerInfoModal.classList.add('active');
+                document.getElementById('proceed-to-payment-btn').addEventListener('click', () => {
+                     const name = document.getElementById('customer-name').value;
+                     const address = document.getElementById('customer-address').value;
+                     if(name && address) {
+                         customerInfoModal.classList.remove('active');
+                         showPaymentSelection({name, address});
+                     } else {
+                         alert('Por favor, preencha seu nome e endereço.');
+                     }
+                });
+            }
+
+            function showPaymentSelection(customerInfo) {
+                const paymentSelectionContent = document.getElementById('payment-selection-content');
                 paymentSelectionContent.innerHTML = `<div class="relative"><h2 class="text-2xl font-bold text-center mb-6">Escolha a forma de pagamento</h2><div class="space-y-4"><button id="pay-with-pix" class="w-full flex items-center justify-center space-x-3 bg-gray-100 font-bold py-3 rounded-lg hover:bg-gray-200"><i data-feather="dollar-sign" class="w-6 h-6"></i><span>PIX</span></button><button id="pay-with-card" class="w-full flex items-center justify-center space-x-3 bg-gray-100 font-bold py-3 rounded-lg hover:bg-gray-200 cursor-not-allowed opacity-50"><i data-feather="credit-card" class="w-6 h-6"></i><span>Cartão de Crédito (em breve)</span></button></div><button id="close-selection-modal" class="absolute -top-4 -right-4 bg-white rounded-full p-1 shadow-md"><i data-feather="x" class="w-6 h-6 text-gray-700"></i></button></div>`;
                 feather.replace();
                 paymentSelectionModal.classList.add('active');
                 document.getElementById('close-selection-modal').addEventListener('click', () => paymentSelectionModal.classList.remove('active'));
                 document.getElementById('pay-with-pix').addEventListener('click', () => {
                     paymentSelectionModal.classList.remove('active');
-                    generatePix(product);
+                    generatePix(customerInfo);
                 });
             }
 
-            async function generatePix(product) {
+            async function generatePix(customerInfo) {
+                const pixModalContent = document.getElementById('pix-modal-content');
                 pixModalContent.innerHTML = `<div class="loader mx-auto"></div><p class="mt-4">A gerar PIX, aguarde...</p>`;
                 pixModal.classList.add('active');
+
+                const total = cart.reduce((acc, item) => {
+                    const itemTotal = parseFloat(item.price) + item.extras.reduce((extraAcc, extra) => extraAcc + extra.price, 0);
+                    return acc + itemTotal;
+                }, 0);
+                
+                const itemsDescription = cart.map(item => item.name).join(', ');
 
                 try {
                     const response = await fetch(`${backendUrl}/criar-pagamento`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ valor: product.price, info: product.name })
+                        body: JSON.stringify({ 
+                            valorTotal: total.toFixed(2), 
+                            nomeCliente: customerInfo.name,
+                            enderecoCliente: customerInfo.address,
+                            itemsDescription
+                        })
                     });
                      const data = await response.json();
                     if (!response.ok) {
@@ -162,7 +332,8 @@
                     });
                 }
             }
-             function startPolling(paymentId) {
+
+            function startPolling(paymentId) {
                 pollingInterval = setInterval(async () => {
                     try {
                         const response = await fetch(`${backendUrl}/verificar-pagamento/${paymentId}`);
@@ -183,11 +354,36 @@
                 pixModalContent.innerHTML = `<div class="text-center"><svg class="mx-auto h-16 w-16 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><h2 class="mt-4 text-2xl font-bold text-gray-800">Pagamento Aprovado!</h2><p class="mt-2 text-gray-600">Obrigado! O seu pedido foi recebido.</p><button id="close-success-modal" class="mt-6 bg-red-600 text-white font-bold py-2 px-6 rounded-lg">Fechar</button></div>`;
                 document.getElementById('close-success-modal').addEventListener('click', () => {
                     pixModal.classList.remove('active');
+                    cart = []; // Limpa o carrinho
+                    updateCart();
                 });
             }
 
+            // Event Listeners
+            document.getElementById('app-container').addEventListener('click', (e) => {
+                const productItem = e.target.closest('.product-item');
+                if (productItem) {
+                    const allProducts = [...products, ...drinks];
+                    const product = allProducts.find(p => p.id === parseInt(productItem.dataset.id));
+                    if(product) openProductModal(product);
+                }
+            });
 
-            renderProducts();
+            cartButton.addEventListener('click', openCartModal);
+            
+            // Fechar modais ao clicar fora
+            [productModal, cartModal, customerInfoModal, paymentSelectionModal, pixModal].forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if(e.target === modal) {
+                        modal.classList.remove('active');
+                        if(modal === pixModal) clearInterval(pollingInterval);
+                    }
+                });
+            });
+
+            // Inicialização
+            renderProducts(productList, products);
+            renderProducts(drinksList, drinks);
         });
     </script>
 </body>
