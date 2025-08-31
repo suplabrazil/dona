@@ -11,7 +11,7 @@
 
     <style>
         body { font-family: 'Inter', sans-serif; }
-        main { padding-bottom: 100px; } /* Espaço para o botão do carrinho */
+        main { padding-bottom: 100px; }
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 50; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal-content { background: white; padding: 1.5rem; border-radius: 0.75rem; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.3s ease; }
@@ -48,10 +48,6 @@
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Mais Vendidos</h2>
                 <div id="product-list" class="grid grid-cols-2 gap-4"></div>
             </section>
-            <section class="mt-8">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Bebidas</h2>
-                <div id="drinks-list" class="grid grid-cols-2 gap-4"></div>
-            </section>
         </main>
     </div>
 
@@ -80,7 +76,7 @@
             let pollingInterval;
             let cart = [];
 
-            const products = [
+            const allProducts = [
                 { id: 1, name: 'Nutella Premium', description: 'Creme de Avelã Nutella, polvilhado com leite Ninho e pedaços de morango.', price: '44.99', image: 'https://iili.io/KKDZMS2.png', best_seller: true, type: 'pizza' },
                 { id: 2, name: '1/2 Mussarela 1/2 Calabresa - Grande (8 pedaços)', description: '1/2 Calabresa 1/2 Mussarela a favorita de todos, combinação perfeita da tradição! O sabor mais vendido em Minas Gerais.', price: '39.99', image: 'https://iili.io/KKDM5Is.png', type: 'pizza' },
                 { id: 3, name: 'Banana Caramelizada', description: 'A mais Vendida, a deliciosa, a insuperável, a fantástica pizza doce de Banana Caramelizada. Prove e se surpreenda!!!!', price: '40.99', image: 'https://iili.io/KKDhrSp.png', type: 'pizza' },
@@ -88,28 +84,20 @@
                 { id: 5, name: '1/2 Portuguesa 1/2 Calabresa - Grande (8 pedaços)', description: '1/2 Portuguesa 1/2 Calabresa uma escolha popular que nunca sai de moda, perfeita para qualquer ocasião!', price: '41.99', image: 'https://iili.io/KKD4Qvn.png', type: 'pizza' },
                 { id: 6, name: '1/2 Frango C/ Catupiry 1/2 Calabresa - Grande (8 pedaços)', description: '1/2 Calabresa 1/2 Frango Catupiry dois clássicos em perfeita harmonia para agradar todos os paladares!', price: '42.99', image: 'https://iili.io/KKb9VqX.png', type: 'pizza' },
             ];
-
-            const drinks = [
-                { id: 7, name: 'Coca-Cola 2L', price: '8.00', image: 'https://placehold.co/400x400/E62A29/FFFFFF?text=Coca-Cola', type: 'drink' },
-                { id: 8, name: 'Fanta Laranja 2L', price: '7.00', image: 'https://placehold.co/400x400/F47920/FFFFFF?text=Fanta', type: 'drink' },
-            ];
             
-            // Elementos da DOM
             const productList = document.getElementById('product-list');
-            const drinksList = document.getElementById('drinks-list');
             const cartButton = document.getElementById('cart-button');
             const cartItemCount = document.getElementById('cart-item-count');
-
-            // Modais
             const productModal = document.getElementById('product-modal');
             const cartModal = document.getElementById('cart-modal');
             const customerInfoModal = document.getElementById('customer-info-modal');
             const paymentSelectionModal = document.getElementById('payment-selection-modal');
             const pixModal = document.getElementById('pix-modal');
+            const pixModalContent = document.getElementById('pix-modal-content');
 
-            function renderProducts(listElement, items) {
-                listElement.innerHTML = '';
-                items.forEach(product => {
+            function renderProducts() {
+                productList.innerHTML = '';
+                allProducts.forEach(product => {
                     const productElement = document.createElement('div');
                     productElement.className = 'bg-white rounded-lg overflow-hidden shadow-sm cursor-pointer product-item flex flex-col';
                     productElement.dataset.id = product.id;
@@ -131,21 +119,26 @@
                             <p class="font-bold text-lg text-green-600 mt-2">R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}</p>
                         </div>
                     `;
-                    listElement.appendChild(productElement);
+                    productList.appendChild(productElement);
                 });
             }
 
             function openProductModal(product) {
                 const productModalContent = document.getElementById('product-modal-content');
-                const extrasHtml = product.type === 'pizza' ? `
-                    <div class="mt-4">
-                        <h3 class="font-semibold mb-2">Adicionais (R$ 5,00 cada):</h3>
-                        <div class="space-y-2">
-                            <label class="flex items-center"><input type="checkbox" name="extra" value="Cheddar" class="mr-2">Borda de Cheddar</label>
-                            <label class="flex items-center"><input type="checkbox" name="extra" value="Catupiry" class="mr-2">Borda de Catupiry</label>
-                        </div>
-                    </div>
-                ` : '';
+                let currentPrice = parseFloat(product.price);
+                
+                const extras = [
+                    { name: 'Borda de Cheddar', price: 5.00 },
+                    { name: 'Borda de Catupiry', price: 5.00 },
+                    { name: 'Coca-Cola 2L', price: 8.00 },
+                    { name: 'Fanta Laranja 2L', price: 7.00 }
+                ];
+
+                let extrasHtml = `<div class="mt-4"><h3 class="font-semibold mb-2">Adicionais:</h3><div class="space-y-2">`;
+                extras.forEach(extra => {
+                    extrasHtml += `<label class="flex items-center"><input type="checkbox" name="extra" value="${extra.name}" data-price="${extra.price}" class="mr-2">${extra.name} (R$ ${extra.price.toFixed(2).replace('.', ',')})</label>`;
+                });
+                extrasHtml += `</div></div>`;
 
                 productModalContent.innerHTML = `
                     <div class="relative">
@@ -154,28 +147,39 @@
                         <h2 class="text-2xl font-bold mb-2">${product.name}</h2>
                         <p class="text-gray-600 mb-4">${product.description || ''}</p>
                         ${extrasHtml}
-                        <div class="flex justify-between items-center mt-4">
-                             <span class="text-2xl font-bold text-green-700">R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}</span>
+                        <div class="flex justify-between items-center mt-6">
+                             <span id="total-price-display" class="text-2xl font-bold text-green-700">R$ ${currentPrice.toFixed(2).replace('.', ',')}</span>
                              <button id="add-to-cart-btn" class="bg-red-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700">Adicionar ao Carrinho</button>
                         </div>
                     </div>`;
                 feather.replace();
                 productModal.classList.add('active');
+
+                const priceDisplay = document.getElementById('total-price-display');
+
+                function updateModalPrice() {
+                    let total = parseFloat(product.price);
+                    document.querySelectorAll('input[name="extra"]:checked').forEach(checkbox => {
+                        total += parseFloat(checkbox.dataset.price);
+                    });
+                    priceDisplay.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+                }
+
+                document.querySelectorAll('input[name="extra"]').forEach(checkbox => {
+                    checkbox.addEventListener('change', updateModalPrice);
+                });
+                
                 document.getElementById('close-product-modal').addEventListener('click', () => productModal.classList.remove('active'));
                 document.getElementById('add-to-cart-btn').addEventListener('click', () => {
                     const selectedExtras = Array.from(document.querySelectorAll('input[name="extra"]:checked'))
-                                              .map(cb => ({ name: cb.value, price: 5.00 }));
+                                              .map(cb => ({ name: cb.value, price: parseFloat(cb.dataset.price) }));
                     addToCart(product, selectedExtras);
                     productModal.classList.remove('active');
                 });
             }
             
             function addToCart(product, extras = []) {
-                const cartItem = {
-                    ...product,
-                    extras,
-                    cartId: Date.now() 
-                };
+                const cartItem = { ...product, extras, cartId: Date.now() };
                 cart.push(cartItem);
                 updateCart();
             }
@@ -183,16 +187,12 @@
             function removeFromCart(cartId) {
                 cart = cart.filter(item => item.cartId !== cartId);
                 updateCart();
-                openCartModal(); // Re-render cart modal after removing item
+                openCartModal();
             }
 
             function updateCart() {
-                if (cart.length > 0) {
-                    cartButton.classList.remove('hidden');
-                    cartItemCount.textContent = cart.length;
-                } else {
-                    cartButton.classList.add('hidden');
-                }
+                cartItemCount.textContent = cart.length;
+                cartButton.classList.toggle('hidden', cart.length === 0);
             }
 
             function openCartModal() {
@@ -219,52 +219,24 @@
                         extrasHtml += '</ul>';
                     }
                     total += itemTotal;
-                    itemsHtml += `
-                        <div class="flex justify-between items-center border-b py-2">
-                            <div>
-                                <p class="font-semibold">${item.name}</p>
-                                ${extrasHtml}
-                            </div>
-                            <div class="flex items-center">
-                                <span class="font-bold mr-4">R$ ${itemTotal.toFixed(2).replace('.', ',')}</span>
-                                <button class="remove-from-cart-btn text-red-500" data-cart-id="${item.cartId}"><i data-feather="trash-2" class="w-5 h-5"></i></button>
-                            </div>
-                        </div>`;
+                    itemsHtml += `<div class="flex justify-between items-center border-b py-2"><div class="flex-1 pr-2"><p class="font-semibold">${item.name}</p>${extrasHtml}</div><div class="flex items-center"><span class="font-bold mr-4">R$ ${itemTotal.toFixed(2).replace('.', ',')}</span><button class="remove-from-cart-btn text-red-500" data-cart-id="${item.cartId}"><i data-feather="trash-2" class="w-5 h-5"></i></button></div></div>`;
                 });
 
-                cartModalContent.innerHTML = `
-                    <div class="relative">
-                         <button id="close-cart-modal" class="absolute -top-4 -right-4 bg-white rounded-full p-1 shadow-md"><i data-feather="x" class="w-6 h-6 text-gray-700"></i></button>
-                         <h2 class="text-2xl font-bold text-center mb-4">Seu Pedido</h2>
-                         <div class="max-h-64 overflow-y-auto mb-4">${itemsHtml}</div>
-                         <div class="flex justify-between font-bold text-xl border-t pt-4">
-                             <span>Total:</span>
-                             <span>R$ ${total.toFixed(2).replace('.', ',')}</span>
-                         </div>
-                         <button id="checkout-btn" class="w-full bg-red-600 text-white font-bold py-3 rounded-lg mt-6">Finalizar Pedido</button>
-                    </div>`;
+                cartModalContent.innerHTML = `<div class="relative"><button id="close-cart-modal" class="absolute -top-4 -right-4 bg-white rounded-full p-1 shadow-md"><i data-feather="x" class="w-6 h-6 text-gray-700"></i></button><h2 class="text-2xl font-bold text-center mb-4">Seu Pedido</h2><div class="max-h-64 overflow-y-auto mb-4">${itemsHtml}</div><div class="flex justify-between font-bold text-xl border-t pt-4"><span>Total:</span><span>R$ ${total.toFixed(2).replace('.', ',')}</span></div><button id="checkout-btn" class="w-full bg-red-600 text-white font-bold py-3 rounded-lg mt-6">Finalizar Pedido</button></div>`;
                 feather.replace();
                 cartModal.classList.add('active');
 
                 document.getElementById('close-cart-modal').addEventListener('click', () => cartModal.classList.remove('active'));
                 document.getElementById('checkout-btn').addEventListener('click', openCustomerInfoModal);
                 document.querySelectorAll('.remove-from-cart-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const cartId = parseInt(e.currentTarget.dataset.cartId);
-                        removeFromCart(cartId);
-                    });
+                    btn.addEventListener('click', (e) => removeFromCart(parseInt(e.currentTarget.dataset.cartId)));
                 });
             }
             
             function openCustomerInfoModal() {
                 cartModal.classList.remove('active');
                 const customerInfoContent = document.getElementById('customer-info-content');
-                customerInfoContent.innerHTML = `
-                    <h2 class="text-2xl font-bold mb-4">Informações de Entrega</h2>
-                    <input type="text" id="customer-name" placeholder="Seu nome completo" class="w-full p-2 border rounded mb-3" required>
-                    <input type="text" id="customer-address" placeholder="Seu endereço com número" class="w-full p-2 border rounded mb-4" required>
-                    <button id="proceed-to-payment-btn" class="w-full bg-red-600 text-white font-bold py-3 rounded-lg">Ir para Pagamento</button>
-                `;
+                customerInfoContent.innerHTML = `<h2 class="text-2xl font-bold mb-4">Informações de Entrega</h2><input type="text" id="customer-name" placeholder="Seu nome completo" class="w-full p-2 border rounded mb-3" required><input type="text" id="customer-address" placeholder="Seu endereço com número" class="w-full p-2 border rounded mb-4" required><button id="proceed-to-payment-btn" class="w-full bg-red-600 text-white font-bold py-3 rounded-lg">Ir para Pagamento</button>`;
                 customerInfoModal.classList.add('active');
                 document.getElementById('proceed-to-payment-btn').addEventListener('click', () => {
                      const name = document.getElementById('customer-name').value;
@@ -291,45 +263,28 @@
             }
 
             async function generatePix(customerInfo) {
-                const pixModalContent = document.getElementById('pix-modal-content');
                 pixModalContent.innerHTML = `<div class="loader mx-auto"></div><p class="mt-4">A gerar PIX, aguarde...</p>`;
                 pixModal.classList.add('active');
 
-                const total = cart.reduce((acc, item) => {
-                    const itemTotal = parseFloat(item.price) + item.extras.reduce((extraAcc, extra) => extraAcc + extra.price, 0);
-                    return acc + itemTotal;
-                }, 0);
-                
+                const total = cart.reduce((acc, item) => acc + parseFloat(item.price) + item.extras.reduce((extraAcc, extra) => extraAcc + extra.price, 0), 0);
                 const itemsDescription = cart.map(item => item.name).join(', ');
 
                 try {
                     const response = await fetch(`${backendUrl}/criar-pagamento`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            valorTotal: total.toFixed(2), 
-                            nomeCliente: customerInfo.name,
-                            enderecoCliente: customerInfo.address,
-                            itemsDescription
-                        })
+                        body: JSON.stringify({ valorTotal: total.toFixed(2), nomeCliente: customerInfo.name, enderecoCliente: customerInfo.address, itemsDescription })
                     });
                      const data = await response.json();
-                    if (!response.ok) {
-                        throw new Error(data.error || 'Falha ao gerar o PIX.');
-                    }
+                    if (!response.ok) throw new Error(data.error || 'Falha ao gerar o PIX.');
 
                     pixModalContent.innerHTML = `<div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">Pague com PIX</h2><button id="close-pix-modal" class="text-gray-500"><i data-feather="x" class="w-6 h-6"></i></button></div><img src="data:image/png;base64,${data.qrCodeBase64}" class="mx-auto my-4 border"><p class="font-semibold">Ou copie o código abaixo:</p><textarea readonly class="w-full p-2 mt-2 bg-gray-100 border rounded-md">${data.copiaECola}</textarea><p id="status-text" class="mt-4 font-semibold">A aguardar pagamento...</p>`;
                     feather.replace();
-                    document.getElementById('close-pix-modal').addEventListener('click', () => {
-                        clearInterval(pollingInterval);
-                        pixModal.classList.remove('active');
-                    });
+                    document.getElementById('close-pix-modal').addEventListener('click', () => { clearInterval(pollingInterval); pixModal.classList.remove('active'); });
                     startPolling(data.paymentId);
                 } catch (error) {
                     pixModalContent.innerHTML = `<h3 class="text-xl font-bold text-red-600">Ocorreu um Erro</h3><p class="text-gray-600 mt-2">${error.message}</p><button id="close-pix-modal-error" class="mt-4 bg-gray-200 px-4 py-2 rounded-lg">Fechar</button>`;
-                     document.getElementById('close-pix-modal-error').addEventListener('click', () => {
-                        pixModal.classList.remove('active');
-                    });
+                     document.getElementById('close-pix-modal-error').addEventListener('click', () => pixModal.classList.remove('active'));
                 }
             }
 
@@ -343,10 +298,7 @@
                             clearInterval(pollingInterval);
                             showSuccessMessage();
                         }
-                    } catch (error) {
-                        console.error('Erro ao verificar status:', error);
-                        clearInterval(pollingInterval);
-                    }
+                    } catch (error) { console.error('Erro ao verificar status:', error); clearInterval(pollingInterval); }
                 }, 3000);
             }
 
@@ -354,16 +306,14 @@
                 pixModalContent.innerHTML = `<div class="text-center"><svg class="mx-auto h-16 w-16 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><h2 class="mt-4 text-2xl font-bold text-gray-800">Pagamento Aprovado!</h2><p class="mt-2 text-gray-600">Obrigado! O seu pedido foi recebido.</p><button id="close-success-modal" class="mt-6 bg-red-600 text-white font-bold py-2 px-6 rounded-lg">Fechar</button></div>`;
                 document.getElementById('close-success-modal').addEventListener('click', () => {
                     pixModal.classList.remove('active');
-                    cart = []; // Limpa o carrinho
+                    cart = [];
                     updateCart();
                 });
             }
 
-            // Event Listeners
             document.getElementById('app-container').addEventListener('click', (e) => {
                 const productItem = e.target.closest('.product-item');
                 if (productItem) {
-                    const allProducts = [...products, ...drinks];
                     const product = allProducts.find(p => p.id === parseInt(productItem.dataset.id));
                     if(product) openProductModal(product);
                 }
@@ -371,7 +321,6 @@
 
             cartButton.addEventListener('click', openCartModal);
             
-            // Fechar modais ao clicar fora
             [productModal, cartModal, customerInfoModal, paymentSelectionModal, pixModal].forEach(modal => {
                 modal.addEventListener('click', (e) => {
                     if(e.target === modal) {
@@ -381,9 +330,7 @@
                 });
             });
 
-            // Inicialização
-            renderProducts(productList, products);
-            renderProducts(drinksList, drinks);
+            renderProducts();
         });
     </script>
 </body>
