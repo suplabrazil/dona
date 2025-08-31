@@ -1,86 +1,104 @@
-// Importa as bibliotecas necessárias
 const express = require('express');
 const cors = require('cors');
-const mercadopago = require('mercadopago');
-const path = require('path'); // Módulo para lidar com caminhos de ficheiros
+const path = require('path');
+const { MercadoPagoConfig, Payment } = require('mercadopago');
 
-// Cria uma instância da aplicação
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// --- CONFIGURAÇÃO IMPORTANTE ---
-// Configura o SDK do Mercado Pago com a sua chave secreta (Access Token)
-mercadopago.configure({
-  access_token: process.env.MP_ACCESS_TOKEN
-});
+// --- CONFIGURAÇÃO ---
+const accessToken = process.env.MP_ACCESS_TOKEN;
+if (!accessToken) {
+    console.error("ERRO: A chave de acesso do Mercado Pago (MP_ACCESS_TOKEN) não foi definida nas variáveis de ambiente.");
+}
+const client = new MercadoPagoConfig({ accessToken });
+const payment = new Payment(client);
 
-// --- SERVIR FICHEIROS DO SITE (FRONT-END) ---
-// Diz ao Express para usar a pasta 'public' para servir ficheiros estáticos (HTML, CSS, JS do site)
-app.use(express.static(path.join(__dirname, 'public')));
+// --- MIDDLEWARE ---
+// Habilita o CORS para permitir que o seu domínio se comunique com o servidor
+const corsOptions = {
+    origin: ['https://donaelma.com', 'https://www.donaelma.com', 'https://dona-5pul.onrender.com'],
+    optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 
-// --- CONFIGURAÇÕES DO SERVIDOR ---
-app.use(cors());
+// Habilita o parsing de JSON no corpo das requisições
 app.use(express.json());
 
-// Rota para criar o pagamento PIX (A NOSSA API)
-app.post('/criar-pagamento', async (req, res) => {
-  try {
-    const { valor, info } = req.body;
+// Serve os ficheiros estáticos (o seu site) da pasta 'public'
+app.use(express.static(path.join(__dirname, 'public')));
 
-    if (!process.env.MP_ACCESS_TOKEN) {
-        console.error('ACCESS TOKEN do Mercado Pago não está configurado no Render.');
-        return res.status(500).json({ error: 'Erro de configuração do servidor.' });
+// --- ROTAS ---
+
+// Rota principal que serve o seu site
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Rota para criar um pagamento PIX
+app.post('/criar-pagamento', async (req, res) => {
+    console.log("A receber pedido para criar pagamento...");
+    if (!accessToken) {
+        return res.status(500).json({ error: "O servidor não está configurado para pagamentos." });
     }
 
-    const payment_data = {
-      transaction_amount: Number(valor),
-      description: info,
-      payment_method_id: 'pix',
-      payer: {
-        email: 'comprador.dona.elma@email.com', 
-        first_name: 'Cliente',
-        last_name: 'Dona Elma'
-      }
-    };
+    try {
+        const { valorTotal, nomeCliente, enderecoCliente, itemsDescription } = req.body;
 
-    const data = await mercadopago.payment.create(payment_data);
+        if (!valorTotal || !nomeCliente || !enderecoCliente || !itemsDescription) {
+             return res.status(400).json({ error: 'Dados do pedido incompletos.' });
+        }
 
-    const qrCodeBase64 = data.body.point_of_interaction.transaction_data.qr_code_base64;
-    const copiaECola = data.body.point_of_interaction.transaction_data.qr_code;
+        const paymentData = {
+            body: {
+                transaction_amount: Number(valorTotal),
+                description: `Pedido para ${nomeCliente} em ${enderecoCliente}: ${itemsDescription}`,
+                payment_method_id: 'pix',
+                payer: {
+                    email: `cliente_${Date.now()}@donaelma.com`, // Email único para cada transação
+                    first_name: nomeCliente,
+                    last_name: 'Cliente',
+                    address: {
+                        street_name: enderecoCliente,
+                        street_number: 123
+                    }
+                },
+                notification_url: "https://dona-5pul.onrender.com/webhook" // Opcional: para receber notificações de pagamento
+            }
+        };
 
-    res.json({
-      paymentId: data.body.id,
-      qrCodeBase64,
-      copiaECola
-    });
+        console.log("A enviar os seguintes dados para o Mercado Pago:", JSON.stringify(paymentData, null, 2));
+        
+        const result = await payment.create(paymentData);
+        
+        console.log("Pagamento criado com sucesso:", result.id);
 
-  } catch (error) {
-    console.error('Erro ao criar pagamento PIX:', error.message);
-    res.status(500).json({ error: 'Falha ao gerar o PIX.' });
-  }
+        res.json({
+            paymentId: result.id,
+            qrCodeBase64: result.point_of_interaction.transaction_data.qr_code_base64,
+            copiaECola: result.point_of_interaction.transaction_data.qr_code
+        });
+
+    } catch (error) {
+        console.error('Erro ao criar pagamento PIX:', error?.cause ?? error.message);
+        const errorMessage = error.cause?.error?.message || 'Ocorreu um erro desconhecido ao comunicar com o sistema de pagamentos.';
+        res.status(500).json({ error: errorMessage });
+    }
 });
 
-// Rota para verificar o pagamento
+// Rota para verificar o status do pagamento
 app.get('/verificar-pagamento/:id', async (req, res) => {
-  try {
-    const paymentId = req.params.id;
-    const { body } = await mercadopago.payment.get(paymentId);
-    
-    res.json({ status: body.status });
-
-  } catch (error) {
-    console.error('Erro ao verificar pagamento:', error.message);
-    res.status(500).json({ error: 'Falha ao verificar o status do pagamento.' });
-  }
-});
-
-// Rota principal que agora serve o seu site
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    try {
+        const paymentDetails = await payment.get({ id: req.params.id });
+        res.json({ status: paymentDetails.status });
+    } catch (error) {
+        console.error('Erro ao verificar pagamento:', error.message);
+        res.status(500).json({ error: 'Erro ao verificar o status do pagamento.' });
+    }
 });
 
 
-// Inicia o servidor
+// --- INICIALIZAÇÃO DO SERVIDOR ---
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor a rodar na porta ${PORT}`);
+    console.log(`Servidor a rodar na porta ${PORT}. O serviço está live.`);
 });
