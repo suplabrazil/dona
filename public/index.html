@@ -19,6 +19,14 @@
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid #c0392b; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+        /* Animação de voar para o carrinho */
+        .fly-to-cart {
+            position: fixed;
+            z-index: 100;
+            border-radius: 50%;
+            transition: all 0.8s cubic-bezier(0.55, 0.085, 0.68, 0.53);
+            object-fit: cover;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -125,7 +133,6 @@
 
             function openProductModal(product) {
                 const productModalContent = document.getElementById('product-modal-content');
-                let currentPrice = parseFloat(product.price);
                 
                 const extras = [
                     { name: 'Borda de Cheddar', price: 5.00 },
@@ -143,13 +150,22 @@
                 productModalContent.innerHTML = `
                     <div class="relative">
                         <button id="close-product-modal" class="absolute -top-4 -right-4 bg-white rounded-full p-1 shadow-md"><i data-feather="x" class="w-6 h-6 text-gray-700"></i></button>
-                        <img src="${product.image}" class="w-full h-48 object-cover rounded-lg mb-4">
+                        <img src="${product.image}" class="w-full h-48 object-cover rounded-lg mb-4" id="modal-product-image">
                         <h2 class="text-2xl font-bold mb-2">${product.name}</h2>
                         <p class="text-gray-600 mb-4">${product.description || ''}</p>
                         ${extrasHtml}
-                        <div class="flex justify-between items-center mt-6">
-                             <span id="total-price-display" class="text-2xl font-bold text-green-700">R$ ${currentPrice.toFixed(2).replace('.', ',')}</span>
-                             <button id="add-to-cart-btn" class="bg-red-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700">Adicionar ao Carrinho</button>
+                        <div class="border-t pt-4 mt-4">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-gray-600 font-medium">Total</span>
+                                <span id="total-price-display" class="text-2xl font-bold text-green-700">R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button id="add-to-cart-btn" class="w-full bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-300 flex items-center justify-center space-x-2">
+                                    <i data-feather="shopping-cart" class="w-5 h-5"></i>
+                                    <span>Adicionar</span>
+                                </button>
+                                <button id="buy-now-btn" class="w-full bg-red-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-red-700">Comprar Agora</button>
+                            </div>
                         </div>
                     </div>`;
                 feather.replace();
@@ -170,11 +186,52 @@
                 });
                 
                 document.getElementById('close-product-modal').addEventListener('click', () => productModal.classList.remove('active'));
+                
                 document.getElementById('add-to-cart-btn').addEventListener('click', () => {
+                    animateToCart();
                     const selectedExtras = Array.from(document.querySelectorAll('input[name="extra"]:checked'))
                                               .map(cb => ({ name: cb.value, price: parseFloat(cb.dataset.price) }));
                     addToCart(product, selectedExtras);
                     productModal.classList.remove('active');
+                });
+
+                document.getElementById('buy-now-btn').addEventListener('click', () => {
+                    const selectedExtras = Array.from(document.querySelectorAll('input[name="extra"]:checked'))
+                                              .map(cb => ({ name: cb.value, price: parseFloat(cb.dataset.price) }));
+                    const singleItem = { ...product, extras, cartId: Date.now() };
+                    cart = [singleItem]; // Temporarily set cart to this single item for checkout
+                    productModal.classList.remove('active');
+                    openCustomerInfoModal();
+                });
+            }
+
+            function animateToCart() {
+                const productImage = document.getElementById('modal-product-image');
+                const cartIcon = document.getElementById('cart-button');
+                
+                const imgClone = productImage.cloneNode(true);
+                const startRect = productImage.getBoundingClientRect();
+                const endRect = cartIcon.getBoundingClientRect();
+
+                imgClone.classList.add('fly-to-cart');
+                document.body.appendChild(imgClone);
+
+                imgClone.style.left = `${startRect.left}px`;
+                imgClone.style.top = `${startRect.top}px`;
+                imgClone.style.width = `${startRect.width}px`;
+                imgClone.style.height = `${startRect.height}px`;
+                imgClone.style.opacity = '1';
+
+                requestAnimationFrame(() => {
+                    imgClone.style.left = `${endRect.left + (endRect.width / 4)}px`;
+                    imgClone.style.top = `${endRect.top + (endRect.height / 4)}px`;
+                    imgClone.style.width = '20px';
+                    imgClone.style.height = '20px';
+                    imgClone.style.opacity = '0';
+                });
+
+                imgClone.addEventListener('transitionend', () => {
+                    imgClone.remove();
                 });
             }
             
@@ -236,17 +293,51 @@
             function openCustomerInfoModal() {
                 cartModal.classList.remove('active');
                 const customerInfoContent = document.getElementById('customer-info-content');
-                customerInfoContent.innerHTML = `<h2 class="text-2xl font-bold mb-4">Informações de Entrega</h2><input type="text" id="customer-name" placeholder="Seu nome completo" class="w-full p-2 border rounded mb-3" required><input type="text" id="customer-address" placeholder="Seu endereço com número" class="w-full p-2 border rounded mb-4" required><button id="proceed-to-payment-btn" class="w-full bg-red-600 text-white font-bold py-3 rounded-lg">Ir para Pagamento</button>`;
+                customerInfoContent.innerHTML = `
+                    <h2 class="text-2xl font-bold mb-4">Informações de Entrega</h2>
+                    <form id="customer-form">
+                        <div class="mb-4">
+                            <label for="customer-name" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
+                            <input type="text" id="customer-name" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="customer-phone" class="block text-sm font-medium text-gray-700 mb-1">Telefone (WhatsApp)</label>
+                            <input type="tel" id="customer-phone" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="(XX) XXXXX-XXXX" required>
+                        </div>
+                        <div class="grid grid-cols-5 gap-4 mb-4">
+                             <div class="col-span-3">
+                                <label for="customer-street" class="block text-sm font-medium text-gray-700 mb-1">Rua</label>
+                                <input type="text" id="customer-street" value="Rua. " class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" required>
+                            </div>
+                             <div class="col-span-2">
+                                <label for="customer-number" class="block text-sm font-medium text-gray-700 mb-1">Número</label>
+                                <input type="text" id="customer-number" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" required>
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <label for="customer-neighborhood" class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
+                            <input type="text" id="customer-neighborhood" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" required>
+                        </div>
+                        <button type="submit" id="proceed-to-payment-btn" class="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700">Ir para Pagamento</button>
+                    </form>
+                `;
                 customerInfoModal.classList.add('active');
-                document.getElementById('proceed-to-payment-btn').addEventListener('click', () => {
-                     const name = document.getElementById('customer-name').value;
-                     const address = document.getElementById('customer-address').value;
-                     if(name && address) {
+                
+                document.getElementById('customer-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('customer-name').value;
+                    const phone = document.getElementById('customer-phone').value;
+                    const street = document.getElementById('customer-street').value;
+                    const number = document.getElementById('customer-number').value;
+                    const neighborhood = document.getElementById('customer-neighborhood').value;
+                    
+                    if(name && phone && street && number && neighborhood) {
+                         const fullAddress = `${street}, ${number} - ${neighborhood}`;
                          customerInfoModal.classList.remove('active');
-                         showPaymentSelection({name, address});
-                     } else {
-                         alert('Por favor, preencha seu nome e endereço.');
-                     }
+                         showPaymentSelection({name, address: fullAddress});
+                    } else {
+                         alert('Por favor, preencha todos os campos.');
+                    }
                 });
             }
 
@@ -335,3 +426,4 @@
     </script>
 </body>
 </html>
+
